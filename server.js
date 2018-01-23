@@ -14,7 +14,7 @@ app.use(postgraphql('postgres://pomb_admin:abc123@localhost:5432/bclynch', ['pom
 
 //routes
 app.use('/upload-images', require('./imageProcessing'));
-app.use('/upload-gpx', require('./gpxProcessing'));
+app.use('/process-gpx', require('./gpxProcessing'));
 
 // Initialize the app.
 app.listen(app.get('port'), () => console.log("You're a wizard, Harry. I'm a what? Yes, a wizard, on port", app.get('port')) );

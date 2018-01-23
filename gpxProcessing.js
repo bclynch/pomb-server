@@ -19,11 +19,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// console.log(JSON.stringify(converted));
-
-// let convertedTimeArr = [];
-// let distanceArr = [];
-
 // Route 
 router.post("/", upload.array("uploads[]", 5), (req, res) => {
   const files = req.files;
@@ -31,7 +26,6 @@ router.post("/", upload.array("uploads[]", 5), (req, res) => {
 
   let converted;
   let gpxData = {};
-  const junctureId = +req.query.juncture;
 
   // we want to combine both the coords and the coordTimes arr of all files
   for(let i = 0; i < files.length; i++) {
@@ -64,72 +58,28 @@ router.post("/", upload.array("uploads[]", 5), (req, res) => {
   gpxData.geoJSON.properties.coordTimes = gpxData.geoJSON.properties.coordTimes.filter((_,i) => i % 10 == 0);
   gpxData.geoJSON.geometry.coordinates = gpxData.geoJSON.geometry.coordinates.filter((_,i) => i % 10 == 0);
 
-  // save to table
-  const sql = createSQLString(gpxData.geoJSON, junctureId);
-  
-  db.query(sql, (err, res) => {
-    if (err) console.log(err);
-    if (res) console.log(`added ${res.length - 2} coords`);
-  });
-
-  // const totalDistance = getTotalDistance(gpxData.geoJSON.geometry.coordinates);
-  // console.log('TOTAL DISTANCE in kms: ', totalDistance / 1000);
-  // gpxData.totalDistance = totalDistance;
-
-  // const speeds = getSpeedArr(gpxData.geoJSON.geometry.coordinates, converted.features[0].properties.coordTimes);
-  // gpxData.speedsArr = speeds;
-
-  // gpxData.timeArr = convertedTimeArr.slice(0);
-  // convertedTimeArr = [];
-
-  // gpxData.distanceArr = distanceArr.slice(0);
-  // distanceArr = [];
-
   res.send(JSON.stringify({data: gpxData}));
 });
 
-//take in coord arr and find total distance
-function getTotalDistance(arr) {
-  totalDistance = 0;
+router.post("/upload", (req, routeResponse) => {
 
-  for(let i = 0; i < arr.length; i++) {
-    if(i < arr.length - 1) {
-      const distance = geolib.getDistance(
-        { latitude: arr[i][1], longitude: arr[i][0] },
-        { latitude: arr[i + 1][1], longitude: arr[i + 1][0] }
-      );
-
-      totalDistance += distance;
-      // distanceArr.push(totalDistance);
-    }
-  }
-  //copying the last elem and pushing to end of arr so it has same count as coord arr.
-  // distanceArr.splice(distanceArr.length - 1, 0, distanceArr[distanceArr.length - 1]);
-
-  return totalDistance;
-}
-
-// function getSpeedArr(geoArr, timeArr) {
-//   let speedsArr = [];
-//   for(let i = 0; i < geoArr.length; i++) {
-//     if(i < geoArr.length - 1) {
-//       const timeToMs = Date.parse(timeArr[i]);
-//       convertedTimeArr.push(timeToMs);
-//       speedsArr.push(geolib.getSpeed(
-//         { lat: geoArr[i][1], lng: geoArr[i][0], time: timeToMs },
-//         { lat: geoArr[i + 1][1], lng: geoArr[i + 1][0], time: Date.parse(timeArr[i + 1]) }
-//       ));
-//     }
-//   }
-//   //copying the last elem and pushing to end of arr so it has same count as coord arr. Same for times
-//   speedsArr.splice(speedsArr.length - 1, 0, speedsArr[speedsArr.length - 1]);
-//   convertedTimeArr.splice(convertedTimeArr.length - 1, 0, convertedTimeArr[convertedTimeArr.length - 1])
-
-//   return speedsArr;
-// }
+  const junctureId = +req.query.juncture;
+  // save to table
+  const sql = createSQLString(req.body, junctureId);
+  
+  db.query(sql, (err, res) => {
+    if (err) routeResponse.send(JSON.stringify({response: 'Error occured upload GPX data'}));
+    if (res) routeResponse.send(JSON.stringify({response: `Uploaded ${res.length - 2} coord pairs to server`}));
+  });
+});
 
 function createSQLString(geoJSON, junctureId) {
   let sql = 'BEGIN; ';
+
+  // delete sql for in case we are overriding existing juncture data
+  sql += 'DELETE FROM pomb.coords WHERE juncture_id = junctureId; ';
+
+  // insert sql
   geoJSON.geometry.coordinates.forEach((event, i) => {
     const coordData = [ event[1], event[0], event[2] ].join(', ');
     sql += `INSERT INTO pomb.coords(juncture_id, lat, lon, elevation, coord_time) VALUES (${junctureId}, ${coordData}, '${geoJSON.properties.coordTimes[i]}'); `;
