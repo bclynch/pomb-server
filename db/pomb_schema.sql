@@ -40,7 +40,8 @@ create type pomb.post_category as enum (
   'Biking',
   'Travel',
   'Culture',
-  'Gear'
+  'Gear',
+  'Food'
 );
 
 create table pomb.post (
@@ -191,103 +192,6 @@ comment on table pomb.post_to_comment is 'Join table for comments on a post';
 comment on column pomb.post_to_comment.post_id is 'Id of the post';
 comment on column pomb.post_to_comment.comment_id is 'Id of the comment';
 
-create table pomb.post_lead_photo (
-  id                  serial primary key,
-  post_id             integer not null references pomb.post(id) on delete cascade,
-  title               text not null check (char_length(title) < 80),
-  description         text,
-  created_at          bigint default (extract(epoch from now()) * 1000),
-  updated_at          timestamp default now()
-);
-
-insert into pomb.post_lead_photo (post_id, title, description) values
-  (1, 'Dat photo title', 'Colombia commentary'),
-  (2, 'Dat photo title', 'Biking Bizness'),
-  (3, 'Dat photo title', 'Hiking is neat'),
-  (4, 'Dat photo title', 'Camping is fun'),
-  (5, 'Dat photo title', 'Food is dope'),
-  (6, 'Dat photo title', 'Travel is lame'),
-  (7, 'Dat photo title', 'Culture is exotic'),
-  (8, 'Dat photo title', 'Culture is exotic'),
-  (9, 'Dat photo title', 'Culture is exotic'),
-  (10, 'Dat photo title', 'Culture is exotic'),
-  (11, 'Dat photo title', 'Culture is exotic'),
-  (12, 'Dat photo title', 'Culture is exotic'),
-  (13, 'Dat photo title', 'Gear snob');
-
-comment on table pomb.post_lead_photo is 'Table with comments from users';
-comment on column pomb.post_lead_photo.id is 'Primary id for the photo';
-comment on column pomb.post_lead_photo.post_id is 'Primary id of post';
-comment on column pomb.post_lead_photo.title is 'Title of photo';
-comment on column pomb.post_lead_photo.description is 'Description of photo';
-comment on column pomb.post_lead_photo.created_at is 'Time comment created at';
-comment on column pomb.post_lead_photo.updated_at is 'Time comment updated at';
-
-create table pomb.lead_photo_link (
-  id                  serial primary key,
-  lead_photo_id       integer not null references pomb.post_lead_photo(id) on delete cascade,
-  size                integer not null,
-  url                 text not null
-);
-
-insert into pomb.lead_photo_link (lead_photo_id, size, url) values
-  (1, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (1, 320, 'https://www.calliaweb.co.uk/wp-content/uploads/2015/10/300x200.jpg'),
-  (2, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (3, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (4, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (5, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (6, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (7, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (8, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (9, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (10, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (11, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (12, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg'),
-  (13, 1220, 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg');
-
-comment on table pomb.lead_photo_link is 'Table with lead photo links';
-comment on column pomb.lead_photo_link.id is 'Id of link';
-comment on column pomb.lead_photo_link.lead_photo_id is 'Id of the referenced photo';
-comment on column pomb.lead_photo_link.size is 'Size of photo';
-comment on column pomb.lead_photo_link.url is 'Url of link';
-
-create table pomb.post_to_gallery_photo ( --one to many
-  id                 serial primary key,
-  post_id            integer not null references pomb.post(id) on delete cascade,
-  photo_url          text not null,
-  description        text
-);
-
-insert into pomb.post_to_gallery_photo (post_id, photo_url, description) values
-  (1, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (1, 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Lower_Yellowstone_Fall-1200px.jpg', 'A beautiful vista accented by your mom'),
-  (1, 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', 'A beautiful vista accented by your mom'),
-  (1, 'http://richard-western.co.uk/wp-content/uploads/2015/06/4.-PG9015-30-1200px.jpg', 'A beautiful vista accented by your mom'),
-  (1, 'http://www.ningalooreefdive.com/wp-content/uploads/2014/10/coralbay-4077-1200px-wm.png', 'A beautiful vista accented by your mom'),
-  (1, 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg/1200px-Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg', 'A beautiful vista accented by your mom'),
-  (3, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (3, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (3, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (5, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (8, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (8, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (8, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (8, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (10, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom');
-
-comment on table pomb.post_to_gallery_photo is 'Join table for gallery photos on a post';
-comment on column pomb.post_to_gallery_photo.id is 'Id of the row';
-comment on column pomb.post_to_gallery_photo.post_id is 'Id of the post';
-comment on column pomb.post_to_gallery_photo.photo_url is 'Url of photo';
-comment on column pomb.post_to_gallery_photo.description is 'Description of photo';
-
 create table pomb.config (
   id                  serial primary key,
   primary_color       text not null check (char_length(primary_color) < 20),
@@ -319,23 +223,21 @@ create table pomb.trip (
   name                text not null check (char_length(name) < 256),
   start_date          bigint not null,
   end_date            bigint,
-  banner_photo        text,
   start_lat           decimal not null,
   start_lon           decimal not null,
   created_at          bigint default (extract(epoch from now()) * 1000),
   updated_at          timestamp default now()
 );
 
-insert into pomb.trip (name, start_date, end_date, banner_photo, start_lat, start_lon) values
-  ('Cool Trip', 1508274574542, 1548282774542, 'https://www.yosemitehikes.com/images/wallpaper/yosemitehikes.com-bridalveil-winter-1200x800.jpg', 37.7749, -122.4194),
-  ('Neat Trip', 1408274574542, 1448274574542, null, 6.2442, -75.5812);
+insert into pomb.trip (name, start_date, end_date, start_lat, start_lon) values
+  ('Cool Trip', 1508274574542, 1548282774542, 37.7749, -122.4194),
+  ('Neat Trip', 1408274574542, 1448274574542, 6.2442, -75.5812);
 
 comment on table pomb.trip is 'Table with POMB trips';
 comment on column pomb.trip.id is 'Primary id for trip';
 comment on column pomb.trip.name is 'Name of trip';
 comment on column pomb.trip.start_date is 'Start date of trip';
 comment on column pomb.trip.end_date is 'End date of trip';
-comment on column pomb.trip.banner_photo is 'Banner photo of trip';
 comment on column pomb.trip.start_lat is 'Starting point latitude of trip';
 comment on column pomb.trip.start_lon is 'Starting poiht longitude of trip';
 comment on column pomb.trip.created_at is 'When trip created';
@@ -381,28 +283,6 @@ comment on column pomb.juncture.is_draft is 'Whether the juncture should be publ
 comment on column pomb.juncture.marker_img is 'Image to be used for markers on our map';
 comment on column pomb.juncture.created_at is 'When juncture created';
 comment on column pomb.juncture.updated_at is 'When juncture last updated';
-
-create table pomb.juncture_to_photo ( --one to many
-  id                 serial primary key,
-  juncture_id        integer not null references pomb.juncture(id) on delete cascade,
-  photo_url          text not null,
-  description        text
-);
-
-insert into pomb.juncture_to_photo (juncture_id, photo_url, description) values
-  (1, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (1, 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Lower_Yellowstone_Fall-1200px.jpg', 'A beautiful vista accented by your mom'),
-  (1, 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', 'A beautiful vista accented by your mom'),
-  (2, 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg/1200px-Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg', 'A beautiful vista accented by your mom'),
-  (3, 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', 'A beautiful vista accented by your mom'),
-  (3, 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', 'A beautiful vista accented by your mom'),
-  (4, 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Lower_Yellowstone_Fall-1200px.jpg', 'A beautiful vista accented by your mom');
-
-comment on table pomb.juncture_to_photo is 'Join table for photos on a juncture';
-comment on column pomb.juncture_to_photo.id is 'Id of the row';
-comment on column pomb.juncture_to_photo.juncture_id is 'Id of the juncture';
-comment on column pomb.juncture_to_photo.photo_url is 'Url of photo';
-comment on column pomb.juncture_to_photo.description is 'Description of photo';
 
 create table pomb.juncture_to_post (
   id                 serial primary key,
@@ -486,6 +366,86 @@ comment on column pomb.email_list.id is 'Primary id for email';
 comment on column pomb.email_list.email is 'Email of user';
 comment on column pomb.email_list.created_at is 'When email created';
 
+-- Limiting choices for type field on image
+create type pomb.image_type as enum (
+  'leadLarge',
+  'leadSmall',
+  'gallery',
+  'banner'
+);
+
+create table pomb.image (
+  id                  serial primary key,
+  trip_id             integer references pomb.trip(id) on delete cascade,
+  juncture_id         integer references pomb.juncture(id) on delete cascade,
+  post_id             integer references pomb.post(id) on delete cascade,
+  type                pomb.image_type not null,
+  url                 text not null,
+  title               text check (char_length(title) < 80),
+  description         text,
+  created_at          bigint default (extract(epoch from now()) * 1000),
+  updated_at          timestamp default now()
+);
+
+insert into pomb.image (trip_id, juncture_id, post_id, type, url, title, description) values
+  (1, 1, 1, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Colombia commentary'),
+  (1, 2, 2, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Biking Bizness'),
+  (null, null, 3, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Hiking is neat'),
+  (1, 1, 4, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Camping is fun'),
+  (null, null, 5, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Food is dope'),
+  (null, null, 6, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Travel is lame'),
+  (null, null, 7, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 8, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 9, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 10, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 11, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 12, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 13, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Gear snob'),
+  (1, 1, 1, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Colombia commentary'),
+  (1, 2, 2, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Biking Bizness'),
+  (null, null, 3, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Hiking is neat'),
+  (1, 1, 4, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Camping is fun'),
+  (null, null, 5, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Food is dope'),
+  (null, null, 6, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Travel is lame'),
+  (null, null, 7, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 8, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 9, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 10, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 11, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 12, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Culture is exotic'),
+  (null, null, 13, 'leadSmall', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Gear snob'),
+  (1, 1, 1, 'gallery', 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', null, 'A beautiful vista accented by your mom'),
+  (1, 1, 1, 'gallery', 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Lower_Yellowstone_Fall-1200px.jpg', null, 'A beautiful vista accented by your mom'),
+  (1, 1, 1, 'gallery', 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', null, 'A beautiful vista accented by your mom'),
+  (1, 1, 1, 'gallery', 'http://richard-western.co.uk/wp-content/uploads/2015/06/4.-PG9015-30-1200px.jpg', null, 'A beautiful vista accented by your mom'),
+  (1, 1, 1, 'gallery', 'http://www.ningalooreefdive.com/wp-content/uploads/2014/10/coralbay-4077-1200px-wm.png', null, 'A beautiful vista accented by your mom'),
+  (1, 1, 1, 'gallery', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg/1200px-Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg', null, 'A beautiful vista accented by your mom'),
+  (null, null, 3, 'gallery', 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', null, 'A beautiful vista accented by your mom'),
+  (null, null, 3, 'gallery', 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', null, 'A beautiful vista accented by your mom'),
+  (1, null, null, 'banner', 'https://www.yosemitehikes.com/images/wallpaper/yosemitehikes.com-bridalveil-winter-1200x800.jpg', null, null),
+  (1, null, null, 'banner', 'https://lonelyplanetimages.imgix.net/a/g/hi/t/4ad86c274b7e632de388dcaca5236ca8-asia.jpg', null, null),
+  (1, null, null, 'banner', 'https://lonelyplanetimages.imgix.net/a/g/hi/t/1dd17a448edb6c7ced392c6a7ea1c0ac-asia.jpg', null, null),
+  (1, null, null, 'banner', 'https://lonelyplanetimages.imgix.net/a/g/hi/t/b3960ccbee8a59ce113d0cce9f53f283-asia.jpg', null, null),
+  (1, 1, null, 'gallery', 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', null, null),
+  (1, 1, null, 'gallery', 'https://upload.wikimedia.org/wikipedia/commons/c/ce/Lower_Yellowstone_Fall-1200px.jpg', null, null),
+  (1, 1, null, 'gallery', 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', null, null),
+  (1, 2, null, 'gallery', 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg/1200px-Sign_of_Brno_University_of_Technology_at_building_in_Brno%2C_Kr%C3%A1lovo_Pole.jpg', null, null),
+  (1, 3, null, 'gallery', 'https://d15shllkswkct0.cloudfront.net/wp-content/blogs.dir/1/files/2015/03/1200px-Hommik_Viru_rabas.jpg', null, null),
+  (1, 3, null, 'gallery', 'http://www.ningalooreefdive.com/wp-content/uploads/2014/01/coralbay-3579-1200px-wm-1.png', null, null);
+
+
+comment on table pomb.image is 'Table with site images';
+comment on column pomb.image.id is 'Primary id for the photo';
+comment on column pomb.image.trip_id is 'Primary id of trip its related to';
+comment on column pomb.image.juncture_id is 'Primary id of juncture its related to';
+comment on column pomb.image.post_id is 'Primary id of post its related to';
+comment on column pomb.image.type is 'Type of image';
+comment on column pomb.image.url is 'Link to image';
+comment on column pomb.image.title is 'Title of image';
+comment on column pomb.image.description is 'Description of image';
+comment on column pomb.image.created_at is 'Time comment created at';
+comment on column pomb.image.updated_at is 'Time comment updated at';
+
 -- *******************************************************************
 -- *********************** Function Queries **************************
 -- *******************************************************************
@@ -531,11 +491,6 @@ create trigger comment_updated_at before update
   for each row
   execute procedure pomb_private.set_updated_at();
 
-create trigger lead_photo_updated_at before update
-  on pomb.post_lead_photo
-  for each row
-  execute procedure pomb_private.set_updated_at();
-
 create trigger config_updated_at before update
   on pomb.config
   for each row
@@ -548,6 +503,11 @@ create trigger trip_updated_at before update
 
 create trigger juncture_updated_at before update
   on pomb.juncture
+  for each row
+  execute procedure pomb_private.set_updated_at();
+
+  create trigger image_updated_at before update
+  on pomb.image
   for each row
   execute procedure pomb_private.set_updated_at();
 
@@ -696,15 +656,12 @@ GRANT usage on schema pomb to pomb_anonymous, pomb_account;
 GRANT usage on all sequences in schema pomb to pomb_account;
 
 GRANT ALL on table pomb.post to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL on table pomb.post_lead_photo to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL on table pomb.lead_photo_link to pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL on table pomb.post_tag to pomb_account;
 GRANT ALL on table pomb.post_to_tag to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL on table pomb.post_to_gallery_photo to pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.trip TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.juncture TO pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL ON TABLE pomb.juncture_to_photo TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.juncture_to_post TO pomb_account; --ultimately needs to be policy in which only own user!
+GRANT ALL ON TABLE pomb.image TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.trip_to_juncture TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.user_to_trip TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.coords TO PUBLIC; --Need to figure this out... Inserting from node
@@ -713,15 +670,12 @@ GRANT ALL ON TABLE pomb.email_list TO PUBLIC; --Need to figure this out... Inser
 GRANT select on table pomb.post to PUBLIC;
 GRANT select on table pomb.post_tag to PUBLIC;
 GRANT select on table pomb.post_to_tag to PUBLIC;
-GRANT select on table pomb.post_to_gallery_photo to PUBLIC;
 GRANT select on table pomb.post_comment to PUBLIC;
 GRANT select on table pomb.post_to_comment to PUBLIC;
 GRANT select on table pomb.account to PUBLIC;
-GRANT select on table pomb.post_lead_photo to PUBLIC;
-GRANT select on table pomb.lead_photo_link to PUBLIC;
+GRANT select on table pomb.image to PUBLIC;
 GRANT SELECT ON TABLE pomb.trip TO PUBLIC;
 GRANT SELECT ON TABLE pomb.juncture TO PUBLIC;
-GRANT SELECT ON TABLE pomb.juncture_to_photo TO PUBLIC;
 GRANT SELECT ON TABLE pomb.juncture_to_post TO PUBLIC;
 GRANT SELECT ON TABLE pomb.trip_to_juncture TO PUBLIC;
 GRANT SELECT ON TABLE pomb.user_to_trip TO PUBLIC;
