@@ -68,7 +68,7 @@ router.post("/upload", (req, routeResponse) => {
   const sql = createSQLString(req.body, junctureId);
   
   db.query(sql, (err, res) => {
-    if (err) routeResponse.send(JSON.stringify({response: 'Error occured upload GPX data'}));
+    if (err) routeResponse.send(JSON.stringify({response: err}));
     if (res) routeResponse.send(JSON.stringify({response: `Uploaded ${res.length - 2} coord pairs to server`}));
   });
 });
@@ -77,7 +77,7 @@ function createSQLString(geoJSON, junctureId) {
   let sql = 'BEGIN; ';
 
   // delete sql for in case we are overriding existing juncture data
-  sql += 'DELETE FROM pomb.coords WHERE juncture_id = junctureId; ';
+  sql += `DELETE FROM pomb.coords WHERE pomb.coords.juncture_id = ${junctureId}; `;
 
   // insert sql
   geoJSON.geometry.coordinates.forEach((event, i) => {
