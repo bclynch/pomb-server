@@ -192,32 +192,6 @@ comment on table pomb.post_to_comment is 'Join table for comments on a post';
 comment on column pomb.post_to_comment.post_id is 'Id of the post';
 comment on column pomb.post_to_comment.comment_id is 'Id of the comment';
 
-create table pomb.config (
-  id                  serial primary key,
-  primary_color       text not null check (char_length(primary_color) < 20),
-  secondary_color     text not null check (char_length(secondary_color) < 20),
-  tagline             text not null check (char_length(tagline) < 80),
-  hero_banner         text not null,
-  featured_story_1    integer not null references pomb.post(id),
-  featured_story_2    integer not null references pomb.post(id),
-  featured_story_3    integer not null references pomb.post(id),
-  updated_at          timestamp default now()
-);
-
-insert into pomb.config (primary_color, secondary_color, tagline, hero_banner, featured_story_1, featured_story_2, featured_story_3) values
-  ('#e1ff00', '#04c960', 'For wherever the road takes you', 'http://www.pinnaclepellet.com/images/1200x300-deep-forest.jpg', 4, 8, 13);
-
-comment on table pomb.config is 'Table with POMB config';
-comment on column pomb.config.id is 'Id for config';
-comment on column pomb.config.primary_color is 'Primary color for site';
-comment on column pomb.config.secondary_color is 'Secondary color for site';
-comment on column pomb.config.tagline is 'Tagline of site';
-comment on column pomb.config.hero_banner is 'Hero banner url';
-comment on column pomb.config.featured_story_1 is 'Featured story for nav';
-comment on column pomb.config.featured_story_2 is 'Featured story for nav';
-comment on column pomb.config.featured_story_3 is 'Featured story for nav';
-comment on column pomb.config.updated_at is 'Last updated';
-
 create table pomb.trip (
   id                  serial primary key,
   user_id             integer not null references pomb.account(id) on delete cascade,
@@ -414,6 +388,34 @@ comment on column pomb.image.title is 'Title of image';
 comment on column pomb.image.description is 'Description of image';
 comment on column pomb.image.created_at is 'Time comment created at';
 comment on column pomb.image.updated_at is 'Time comment updated at';
+
+create table pomb.config (
+  id                  serial primary key,
+  primary_color       text not null check (char_length(primary_color) < 20),
+  secondary_color     text not null check (char_length(secondary_color) < 20),
+  tagline             text not null check (char_length(tagline) < 80),
+  hero_banner         text not null,
+  featured_story_1    integer not null references pomb.post(id),
+  featured_story_2    integer not null references pomb.post(id),
+  featured_story_3    integer not null references pomb.post(id),
+  featured_trip_1     integer not null references pomb.trip(id),
+  updated_at          timestamp default now()
+);
+
+insert into pomb.config (primary_color, secondary_color, tagline, hero_banner, featured_story_1, featured_story_2, featured_story_3, featured_trip_1) values
+  ('#e1ff00', '#04c960', 'For wherever the road takes you', 'http://www.pinnaclepellet.com/images/1200x300-deep-forest.jpg', 4, 8, 13, 1);
+
+comment on table pomb.config is 'Table with POMB config';
+comment on column pomb.config.id is 'Id for config';
+comment on column pomb.config.primary_color is 'Primary color for site';
+comment on column pomb.config.secondary_color is 'Secondary color for site';
+comment on column pomb.config.tagline is 'Tagline of site';
+comment on column pomb.config.hero_banner is 'Hero banner url';
+comment on column pomb.config.featured_story_1 is 'Featured story for nav';
+comment on column pomb.config.featured_story_2 is 'Featured story for nav';
+comment on column pomb.config.featured_story_3 is 'Featured story for nav';
+comment on column pomb.config.featured_trip_1 is 'Featured trip for nav';
+comment on column pomb.config.updated_at is 'Last updated';
 
 -- *******************************************************************
 -- *********************** Function Queries **************************
