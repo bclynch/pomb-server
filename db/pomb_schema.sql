@@ -490,7 +490,7 @@ create trigger juncture_updated_at before update
 
 -- Below creates a materialized view to allow for indexing across tables
 
-CREATE MATERIALIZED VIEW pomb.search_index AS
+CREATE MATERIALIZED VIEW pomb.post_search_index AS
 SELECT pomb.post.*,
   setweight(to_tsvector('english', pomb.post.title), 'A') || 
   setweight(to_tsvector('english', pomb.post.subtitle), 'B') ||
@@ -504,18 +504,42 @@ JOIN pomb.post_tag ON pomb.post_tag.id = pomb.post_to_tag.post_tag_id
 -- JOIN pomb.post_category ON pomb.post_category.id = pomb.post_to_category.post_category_id
 GROUP BY pomb.post.id, pomb.post_tag.id; 
 
-CREATE INDEX idx_post_search ON pomb.search_index USING gin(document);
+CREATE INDEX idx_post_search ON pomb.post_search_index USING gin(document);
 
--- Then reindexing the search engine will be as simple as periodically running REFRESH MATERIALIZED VIEW search_index;
+-- Then reindexing the search engine will be as simple as periodically running REFRESH MATERIALIZED VIEW post_search_index;
+
+-- Trip search searches through trips && junctures
+
+CREATE MATERIALIZED VIEW pomb.trip_search_index AS
+SELECT pomb.trip.*,
+  setweight(to_tsvector('english', pomb.trip.name), 'A') ||
+  setweight(to_tsvector('english', pomb.juncture.name), 'B') ||
+  setweight(to_tsvector('english', pomb.juncture.description), 'C') ||
+  setweight(to_tsvector('english', pomb.juncture.city), 'D') ||
+  setweight(to_tsvector('english', pomb.juncture.country), 'D') as document
+FROM pomb.trip
+JOIN pomb.juncture ON pomb.juncture.trip_id = pomb.trip.id
+GROUP BY pomb.trip.id, pomb.juncture.id;
+
+CREATE INDEX idx_trip_search ON pomb.trip_search_index USING gin(document);
+
+CREATE MATERIALIZED VIEW pomb.account_search_index AS
+SELECT pomb.account.*,
+  setweight(to_tsvector('english', pomb.account.username), 'A') ||
+  setweight(to_tsvector('english', pomb.account.first_name), 'B') ||
+  setweight(to_tsvector('english', pomb.account.last_name), 'B') as document
+FROM pomb.account;
+
+CREATE INDEX idx_account_search ON pomb.account_search_index USING gin(document);
 
 -- Simple (instead of english) is one of the built in search text configs that Postgres provides. simple doesn't ignore stopwords and doesn't try to find the stem of the word. 
 -- With simple every group of characters separated by a space is a lexeme; the simple text search config is pratical for data like a person's name for which we may not want to find the stem of the word.
 
-create function pomb.search_posts(query text) returns setof pomb.search_index as $$
+create function pomb.search_posts(query text) returns setof pomb.post_search_index as $$
 
   SELECT post FROM (
     SELECT DISTINCT ON(post.id) post, max(ts_rank(document, to_tsquery('english', query)))
-      FROM pomb.search_index as post
+      FROM pomb.post_search_index as post
       WHERE document @@ to_tsquery('english', query)
     GROUP BY post.id, post.*
     order by post.id, max DESC
@@ -525,6 +549,36 @@ create function pomb.search_posts(query text) returns setof pomb.search_index as
 $$ language sql stable;
 
 comment on function pomb.search_posts(text) is 'Returns posts given a search term.';
+
+create function pomb.search_trips(query text) returns setof pomb.trip_search_index as $$
+
+  SELECT trip FROM (
+    SELECT DISTINCT ON(trip.id) trip, max(ts_rank(document, to_tsquery('english', query)))
+      FROM pomb.trip_search_index as trip
+      WHERE document @@ to_tsquery('english', query)
+    GROUP BY trip.id, trip.*
+    order by trip.id, max DESC
+  ) search_results
+  order by search_results.max DESC;
+
+$$ language sql stable;
+
+comment on function pomb.search_trips(text) is 'Returns trips given a search term.';
+
+create function pomb.search_accounts(query text) returns setof pomb.account_search_index as $$
+
+  SELECT account FROM (
+    SELECT DISTINCT ON(account.id) account, max(ts_rank(document, to_tsquery('english', query)))
+      FROM pomb.account_search_index as account
+      WHERE document @@ to_tsquery('english', query)
+    GROUP BY account.id, account.*
+    order by account.id, max DESC
+  ) search_results
+  order by search_results.max DESC;
+
+$$ language sql stable;
+
+comment on function pomb.search_accounts(text) is 'Returns accounts given a search term.';
 
 -- *******************************************************************
 -- ************************* Auth ************************************
@@ -646,14 +700,18 @@ GRANT SELECT ON TABLE pomb.juncture_to_post TO PUBLIC;
 
 GRANT ALL on table pomb.config to PUBLIC; -- ultimately needs to only be admin account that can mod
 GRANT ALL on table pomb.account to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT select on pomb.search_index to PUBLIC;
+GRANT select on pomb.post_search_index to PUBLIC;
+GRANT select on pomb.trip_search_index to PUBLIC;
+GRANT select on pomb.account_search_index to PUBLIC;
 
 GRANT execute on function pomb.register_account(text, text, text, text, text) to pomb_anonymous;
 GRANT execute on function pomb.authenticate_account(text, text) to pomb_anonymous;
 GRANT execute on function pomb.current_account() to PUBLIC;
 GRANT execute on function pomb.posts_by_tag(integer) to PUBLIC;
 GRANT execute on function pomb.search_tags(text) to PUBLIC;
-GRANT execute on function pomb.search_posts(text) to PUBLIC; 
+GRANT execute on function pomb.search_posts(text) to PUBLIC;
+GRANT execute on function pomb.search_trips(text) to PUBLIC; 
+GRANT execute on function pomb.search_accounts(text) to PUBLIC;  
 
 -- ///////////////// RLS Policies ////////////////////////////////
 
