@@ -38,6 +38,7 @@ create table pomb.trip (
   id                  serial primary key,
   user_id             integer not null references pomb.account(id) on delete cascade,
   name                text not null check (char_length(name) < 256),
+  description         text check (char_length(name) < 2400),
   start_date          bigint not null,
   end_date            bigint,
   start_lat           decimal not null,
@@ -46,14 +47,15 @@ create table pomb.trip (
   updated_at          timestamp default now()
 );
 
-insert into pomb.trip (user_id, name, start_date, end_date, start_lat, start_lon) values
-  (1, 'Cool Trip', 1508274574542, 1548282774542, 37.7749, -122.4194),
-  (1, 'Neat Trip', 1408274574542, 1448274574542, 6.2442, -75.5812);
+insert into pomb.trip (user_id, name, description, start_date, end_date, start_lat, start_lon) values
+  (1, 'Cool Trip', '<p><em><span style="font-size: 24px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 1</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 2</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 3</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p>', 1508274574542, 1548282774542, 37.7749, -122.4194),
+  (1, 'Neat Trip', null, 1408274574542, 1448274574542, 6.2442, -75.5812);
 
 comment on table pomb.trip is 'Table with POMB trips';
 comment on column pomb.trip.id is 'Primary id for trip';
 comment on column pomb.trip.user_id is 'User id who created trip';
 comment on column pomb.trip.name is 'Name of trip';
+comment on column pomb.trip.description is 'Description of trip';
 comment on column pomb.trip.start_date is 'Start date of trip';
 comment on column pomb.trip.end_date is 'End date of trip';
 comment on column pomb.trip.start_lat is 'Starting point latitude of trip';
