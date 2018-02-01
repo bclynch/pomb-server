@@ -32,6 +32,7 @@ app.use(postgraphql(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
 //routes
 app.use('/upload-images', require('./imageProcessing'));
 app.use('/process-gpx', require('./gpxProcessing'));
+app.use('/analytics', require('./analytics'));
 
 // Initialize the app.
 app.listen(app.get('port'), () => console.log("You're a wizard, Harry. I'm a what? Yes, a wizard, on port", app.get('port')) );
