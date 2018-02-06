@@ -360,8 +360,33 @@ comment on column pomb.image.type is 'Type of image';
 comment on column pomb.image.url is 'Link to image';
 comment on column pomb.image.title is 'Title of image';
 comment on column pomb.image.description is 'Description of image';
-comment on column pomb.image.created_at is 'Time comment created at';
-comment on column pomb.image.updated_at is 'Time comment updated at';
+comment on column pomb.image.created_at is 'Time image created at';
+comment on column pomb.image.updated_at is 'Time image updated at';
+
+create table pomb.like (
+  id                  serial primary key,
+  trip_id             integer references pomb.trip(id) on delete cascade,
+  juncture_id         integer references pomb.juncture(id) on delete cascade,
+  post_id             integer references pomb.post(id) on delete cascade,
+  image_id            integer references pomb.image(id) on delete cascade,
+  user_id             integer not null references pomb.account(id) on delete cascade,
+  created_at          bigint default (extract(epoch from now()) * 1000)
+);
+
+insert into pomb.like (trip_id, juncture_id, post_id, image_id, user_id) values
+  (1, null, null, null, 1),
+  (null, 1, null, null, 1),
+  (null, null, 1, null, 1),
+  (null, null, null, 1, 1);
+
+comment on table pomb.like is 'Table with likes for various site assets';
+comment on column pomb.like.id is 'Primary id for the like';
+comment on column pomb.like.trip_id is 'Primary id of trip its related to';
+comment on column pomb.like.juncture_id is 'Primary id of juncture its related to';
+comment on column pomb.like.post_id is 'Primary id of post its related to';
+comment on column pomb.like.post_id is 'Primary id of image its related to';
+comment on column pomb.like.user_id is 'Primary id of user who liked asset';
+comment on column pomb.like.created_at is 'Time like created at';
 
 create table pomb.config (
   id                  serial primary key,
@@ -442,7 +467,7 @@ create trigger juncture_updated_at before update
   for each row
   execute procedure pomb_private.set_updated_at();
 
-  create trigger image_updated_at before update
+create trigger image_updated_at before update
   on pomb.image
   for each row
   execute procedure pomb_private.set_updated_at();
@@ -648,6 +673,7 @@ GRANT ALL on table pomb.post_to_tag to pomb_account; --ultimately needs to be po
 GRANT ALL ON TABLE pomb.trip TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.juncture TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.image TO pomb_account; --ultimately needs to be policy in which only own user!
+GRANT ALL ON TABLE pomb.like TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.coords TO PUBLIC; --Need to figure this out... Inserting from node
 GRANT ALL ON TABLE pomb.email_list TO PUBLIC; --Need to figure this out... Inserting from node
 
@@ -660,6 +686,7 @@ GRANT select on table pomb.account to PUBLIC;
 GRANT select on table pomb.image to PUBLIC;
 GRANT SELECT ON TABLE pomb.trip TO PUBLIC;
 GRANT SELECT ON TABLE pomb.juncture TO PUBLIC;
+GRANT SELECT ON TABLE pomb.like TO PUBLIC;
 
 GRANT ALL on table pomb.config to PUBLIC; -- ultimately needs to only be admin account that can mod
 GRANT ALL on table pomb.account to pomb_account; --ultimately needs to be policy in which only own user!
