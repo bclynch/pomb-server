@@ -609,6 +609,52 @@ $$ language plpgsql strict security definer;
 
 comment on function pomb.register_account(text, text, text, text, text) is 'Registers and creates an account for POMB.';
 
+create function pomb.update_password(
+  email text,
+  password text,
+  new_password text
+) returns boolean as $$
+declare
+  account pomb_private.user_account;
+begin
+  select a.* into account
+  from pomb_private.user_account as a
+  where a.email = $1;
+
+  if account.password_hash = crypt(password, account.password_hash) then
+    UPDATE pomb_private.user_account set password_hash = crypt(new_password, gen_salt('bf')) where pomb_private.user_account.email = $1;
+    return true;
+  else
+    return false;
+  end if;
+end;
+$$ language plpgsql strict security definer;
+
+comment on function pomb.update_password(text, text, text) is 'Updates the password of a user.';
+
+create function pomb.reset_password(
+  email text
+) returns TEXT as $$
+DECLARE account pomb_private.user_account;
+DECLARE randomString TEXT;
+begin
+  select a.* into account
+  from pomb_private.user_account as a
+  where a.email = $1;
+
+  randomString := md5(random()::text);
+  -- check and see if user exists
+  if account.email = email then
+    UPDATE pomb_private.user_account set password_hash = crypt(randomString, gen_salt('bf')) where pomb_private.user_account.email = $1;
+    return randomString;
+  else
+    return "user does not exist";
+  end if; 
+end;
+$$ language plpgsql strict security definer;
+
+comment on function pomb.reset_password(text) is 'Reset the password of a user.';
+
 -- *******************************************************************
 -- ************************* Roles ************************************
 -- *******************************************************************
@@ -695,6 +741,8 @@ GRANT select on pomb.trip_search_index to PUBLIC;
 GRANT select on pomb.account_search_index to PUBLIC;
 
 GRANT execute on function pomb.register_account(text, text, text, text, text) to pomb_anonymous;
+GRANT execute on function pomb.update_password(text, text, text) to pomb_anonymous;
+GRANT execute on function pomb.reset_password(text) to pomb_anonymous;
 GRANT execute on function pomb.authenticate_account(text, text) to pomb_anonymous;
 GRANT execute on function pomb.current_account() to PUBLIC;
 GRANT execute on function pomb.search_tags(text) to PUBLIC;
