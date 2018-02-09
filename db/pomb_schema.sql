@@ -9,18 +9,22 @@ create schema pomb_private;
 alter default privileges revoke execute on functions from public;
 
 create table pomb.account (
-  id                  serial primary key,
-  username            text unique not null check (char_length(username) < 80),
-  first_name          text check (char_length(first_name) < 80),
-  last_name           text check (char_length(last_name) < 100),
-  profile_photo       text,
-  hero_photo          text,
-  created_at          bigint default (extract(epoch from now()) * 1000),
-  updated_at          timestamp default now()
+  id                   serial primary key,
+  username             text unique not null check (char_length(username) < 80),
+  first_name           text check (char_length(first_name) < 80),
+  last_name            text check (char_length(last_name) < 100),
+  profile_photo        text,
+  hero_photo           text,
+  city                 text check (char_length(first_name) < 80),
+  country              text check (char_length(first_name) < 80),
+  auto_update_location boolean not null default true,
+  user_status          text check (char_length(first_name) < 300),
+  created_at           bigint default (extract(epoch from now()) * 1000),
+  updated_at           timestamp default now()
 );
 
-insert into pomb.account (username, first_name, last_name, profile_photo) values
-  ('teeth-creep', 'Ms', 'D', 'https://laze-app.s3.amazonaws.com/19243203_10154776689779211_34706076750698170_o-w250-1509052127322.jpg');
+insert into pomb.account (username, first_name, last_name, profile_photo, city, country, user_status, auto_update_location) values
+  ('teeth-creep', 'Ms', 'D', 'https://laze-app.s3.amazonaws.com/19243203_10154776689779211_34706076750698170_o-w250-1509052127322.jpg', 'London', 'UK', 'Living the dream', true);
 
 comment on table pomb.account is 'Table with POMB users';
 comment on column pomb.account.id is 'Primary id for account';
@@ -29,6 +33,10 @@ comment on column pomb.account.first_name is 'First name of account';
 comment on column pomb.account.last_name is 'Last name of account';
 comment on column pomb.account.profile_photo is 'Profile photo of account';
 comment on column pomb.account.hero_photo is 'Hero photo of account';
+comment on column pomb.account.city is 'Current city';
+comment on column pomb.account.country is 'Current country';
+comment on column pomb.account.auto_update_location is 'Toggle to update location on juncture creation';
+comment on column pomb.account.user_status is 'Current status';
 comment on column pomb.account.created_at is 'When account created';
 comment on column pomb.account.updated_at is 'When account last updated';
 
@@ -610,7 +618,7 @@ $$ language plpgsql strict security definer;
 comment on function pomb.register_account(text, text, text, text, text) is 'Registers and creates an account for POMB.';
 
 create function pomb.update_password(
-  email text,
+  user_id integer,
   password text,
   new_password text
 ) returns boolean as $$
@@ -619,10 +627,10 @@ declare
 begin
   select a.* into account
   from pomb_private.user_account as a
-  where a.email = $1;
+  where a.account_id = $1;
 
   if account.password_hash = crypt(password, account.password_hash) then
-    UPDATE pomb_private.user_account set password_hash = crypt(new_password, gen_salt('bf')) where pomb_private.user_account.email = $1;
+    UPDATE pomb_private.user_account set password_hash = crypt(new_password, gen_salt('bf')) where pomb_private.user_account.account_id = $1;
     return true;
   else
     return false;
@@ -630,7 +638,7 @@ begin
 end;
 $$ language plpgsql strict security definer;
 
-comment on function pomb.update_password(text, text, text) is 'Updates the password of a user.';
+comment on function pomb.update_password(integer, text, text) is 'Updates the password of a user.';
 
 create function pomb.reset_password(
   email text
@@ -741,8 +749,8 @@ GRANT select on pomb.trip_search_index to PUBLIC;
 GRANT select on pomb.account_search_index to PUBLIC;
 
 GRANT execute on function pomb.register_account(text, text, text, text, text) to pomb_anonymous;
-GRANT execute on function pomb.update_password(text, text, text) to pomb_anonymous;
-GRANT execute on function pomb.reset_password(text) to pomb_anonymous;
+GRANT execute on function pomb.update_password(integer, text, text) to pomb_account;
+GRANT execute on function pomb.reset_password(text) to pomb_anonymous, pomb_account;
 GRANT execute on function pomb.authenticate_account(text, text) to pomb_anonymous;
 GRANT execute on function pomb.current_account() to PUBLIC;
 GRANT execute on function pomb.search_tags(text) to PUBLIC;
