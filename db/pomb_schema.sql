@@ -40,7 +40,7 @@ comment on column pomb.account.user_status is 'Current status';
 comment on column pomb.account.created_at is 'When account created';
 comment on column pomb.account.updated_at is 'When account last updated';
 
---alter table pomb.account enable row level security;
+alter table pomb.account enable row level security;
 
 create table pomb.trip (
   id                  serial primary key,
@@ -70,6 +70,8 @@ comment on column pomb.trip.start_lat is 'Starting point latitude of trip';
 comment on column pomb.trip.start_lon is 'Starting poiht longitude of trip';
 comment on column pomb.trip.created_at is 'When trip created';
 comment on column pomb.trip.updated_at is 'When trip last updated';
+
+alter table pomb.trip enable row level security;
 
 create table pomb.juncture (
   id                  serial primary key,
@@ -116,6 +118,8 @@ comment on column pomb.juncture.marker_img is 'Image to be used for markers on o
 comment on column pomb.juncture.created_at is 'When juncture created';
 comment on column pomb.juncture.updated_at is 'When juncture last updated';
 
+alter table pomb.juncture enable row level security;
+
 create table pomb.post (
   id                  serial primary key,
   author              integer not null references pomb.account(id) on delete cascade,
@@ -161,7 +165,7 @@ comment on column pomb.post.published_date is 'Date post is published';
 comment on column pomb.post.created_at is 'When post created';
 comment on column pomb.post.updated_at is 'Last updated date';
 
---alter table pomb.post enable row level security;
+alter table pomb.post enable row level security;
 
 create table pomb.post_tag (
   name                text primary key,
@@ -181,6 +185,8 @@ insert into pomb.post_tag (name, tag_description) values
 comment on table pomb.post_tag is 'Table with post tags available';
 comment on column pomb.post_tag.name is 'Name of the post tag and primary id';
 comment on column pomb.post_tag.tag_description is 'Description of the post tag';
+
+alter table pomb.post_tag enable row level security;
 
 create table pomb.post_to_tag ( --one to many
   id                 serial primary key,
@@ -216,51 +222,6 @@ comment on table pomb.post_to_tag is 'Join table for tags on a post';
 comment on column pomb.post_to_tag.id is 'Id of the row';
 comment on column pomb.post_to_tag.post_id is 'Id of the post';
 comment on column pomb.post_to_tag.post_tag_id is 'Name of the post tag';
-
-create table pomb.post_comment (
-  id                  serial primary key,
-  author              integer not null references pomb.account(id),
-  content             text not null,
-  created_at          bigint default (extract(epoch from now()) * 1000),
-  updated_at          timestamp default now()
-);
-
-insert into pomb.post_comment (author, content) values
-  (1, 'Colombia commentary'),
-  (1, 'Biking Bizness'),
-  (1, 'Hiking is neat'),
-  (1, 'Camping is fun'),
-  (1, 'Food is dope'),
-  (1, 'Travel is lame'),
-  (1, 'Culture is exotic'),
-  (1, 'Gear snob');
-
-comment on table pomb.post_comment is 'Table with comments from users';
-comment on column pomb.post_comment.id is 'Primary id for the comment';
-comment on column pomb.post_comment.author is 'Primary id of author';
-comment on column pomb.post_comment.content is 'Body of the comment';
-comment on column pomb.post_comment.created_at is 'Time comment created at';
-comment on column pomb.post_comment.updated_at is 'Time comment updated at';
-
-create table pomb.post_to_comment ( --one to many
-  post_id            integer not null references pomb.post(id) on delete cascade,
-  comment_id         integer not null references pomb.post_comment(id)
-);
-
-insert into pomb.post_to_comment (post_id, comment_id) values
-  (1, 1),
-  (1, 4),
-  (2, 7),
-  (3, 1),
-  (3, 3),
-  (3, 5),
-  (4, 7),
-  (4, 3),
-  (5, 2);
-
-comment on table pomb.post_to_comment is 'Join table for comments on a post';
-comment on column pomb.post_to_comment.post_id is 'Id of the post';
-comment on column pomb.post_to_comment.comment_id is 'Id of the comment';
 
 create table pomb.coords (
   id                  serial primary key,
@@ -371,6 +332,8 @@ comment on column pomb.image.description is 'Description of image';
 comment on column pomb.image.created_at is 'Time image created at';
 comment on column pomb.image.updated_at is 'Time image updated at';
 
+alter table pomb.image enable row level security;
+
 create table pomb.like (
   id                  serial primary key,
   trip_id             integer references pomb.trip(id) on delete cascade,
@@ -395,6 +358,8 @@ comment on column pomb.like.post_id is 'Primary id of post its related to';
 comment on column pomb.like.post_id is 'Primary id of image its related to';
 comment on column pomb.like.user_id is 'Primary id of user who liked asset';
 comment on column pomb.like.created_at is 'Time like created at';
+
+alter table pomb.like enable row level security;
 
 create table pomb.config (
   id                  serial primary key,
@@ -452,11 +417,6 @@ create trigger post_updated_at before update
 
 create trigger account_updated_at before update
   on pomb.account
-  for each row
-  execute procedure pomb_private.set_updated_at();
-
-create trigger comment_updated_at before update
-  on pomb.post_comment
   for each row
   execute procedure pomb_private.set_updated_at();
 
@@ -721,29 +681,13 @@ comment on function pomb.current_account() is 'Gets the account that was identif
 GRANT usage on schema pomb to pomb_anonymous, pomb_account;
 GRANT usage on all sequences in schema pomb to pomb_account;
 
-GRANT ALL on table pomb.post to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL on table pomb.post_tag to pomb_account;
 GRANT ALL on table pomb.post_to_tag to pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL ON TABLE pomb.trip TO pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL ON TABLE pomb.juncture TO pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL ON TABLE pomb.image TO pomb_account; --ultimately needs to be policy in which only own user!
-GRANT ALL ON TABLE pomb.like TO pomb_account; --ultimately needs to be policy in which only own user!
 GRANT ALL ON TABLE pomb.coords TO PUBLIC; --Need to figure this out... Inserting from node
-GRANT ALL ON TABLE pomb.email_list TO PUBLIC; --Need to figure this out... Inserting from node
+GRANT SELECT, INSERT ON TABLE pomb.email_list TO PUBLIC;
 
-GRANT select on table pomb.post to PUBLIC;
-GRANT select on table pomb.post_tag to PUBLIC;
-GRANT select on table pomb.post_to_tag to PUBLIC;
-GRANT select on table pomb.post_comment to PUBLIC;
-GRANT select on table pomb.post_to_comment to PUBLIC;
-GRANT select on table pomb.account to PUBLIC;
-GRANT select on table pomb.image to PUBLIC;
-GRANT SELECT ON TABLE pomb.trip TO PUBLIC;
-GRANT SELECT ON TABLE pomb.juncture TO PUBLIC;
-GRANT SELECT ON TABLE pomb.like TO PUBLIC;
+GRANT SELECT ON TABLE pomb.post_to_tag to PUBLIC;
 
 GRANT ALL on table pomb.config to PUBLIC; -- ultimately needs to only be admin account that can mod
-GRANT ALL on table pomb.account to pomb_account; --ultimately needs to be policy in which only own user!
 GRANT select on pomb.post_search_index to PUBLIC;
 GRANT select on pomb.trip_search_index to PUBLIC;
 GRANT select on pomb.account_search_index to PUBLIC;
@@ -760,19 +704,77 @@ GRANT execute on function pomb.search_accounts(text) to PUBLIC;
 
 -- ///////////////// RLS Policies ////////////////////////////////
 
--- Can make it an 'all' by omitting the for ... (update) statement
--- Can only do one type of method per policy
+-- Account policy
+GRANT ALL ON TABLE pomb.account TO pomb_account, pomb_anonymous;
+CREATE POLICY select_account ON pomb.account for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_account ON pomb.account for INSERT TO pomb_anonymous
+  WITH CHECK (true);
+CREATE POLICY update_account ON pomb.account for UPDATE TO pomb_account
+  USING (id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_account ON pomb.account for DELETE TO pomb_account
+  USING (id = current_setting('jwt.claims.account_id')::INTEGER);
 
--- --only user can edit account
--- create policy account_update on pomb.account for UPDATE to pomb_account
---   using (id = current_setting('jwt.claims.account_id')::integer);
+-- Trips policy
+GRANT ALL ON TABLE pomb.trip TO pomb_account, pomb_anonymous;
+CREATE POLICY select_trip ON pomb.trip for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_trip ON pomb.trip for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_trip ON pomb.trip for UPDATE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_trip ON pomb.trip for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 
--- -- only user can edit, delete posts
--- create policy account_post_update on pomb.post for UPDATE to pomb_account
---   using (id = current_setting('jwt.claims.account_id')::integer);
+-- Junctures policy
+GRANT ALL ON TABLE pomb.juncture TO pomb_account, pomb_anonymous;
+CREATE POLICY select_juncture ON pomb.juncture for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_juncture ON pomb.juncture for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_juncture ON pomb.juncture for UPDATE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_juncture ON pomb.juncture for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 
--- create policy account_post_delete on pomb.post for DELETE to pomb_account
---   using (id = current_setting('jwt.claims.account_id')::integer);
+-- Posts policy
+GRANT ALL ON TABLE pomb.post TO pomb_account, pomb_anonymous;
+CREATE POLICY select_post ON pomb.post for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_post ON pomb.post for INSERT TO pomb_account
+  WITH CHECK (author = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_post ON pomb.post for UPDATE TO pomb_account
+  USING (author = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_post ON pomb.post for DELETE TO pomb_account
+  USING (author = current_setting('jwt.claims.account_id')::INTEGER);
 
+-- Images policy
+GRANT ALL ON TABLE pomb.image TO pomb_account, pomb_anonymous;
+CREATE POLICY select_image ON pomb.image for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_image ON pomb.image for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_image ON pomb.image for UPDATE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_image ON pomb.image for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+
+-- Post tag policy
+GRANT ALL ON TABLE pomb.post_tag TO pomb_account, pomb_anonymous;
+CREATE POLICY select_post_tag ON pomb.post_tag for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_post_tag ON pomb.post_tag for INSERT TO pomb_account
+  WITH CHECK (true);
+
+-- Likes policy
+GRANT ALL ON TABLE pomb.like TO pomb_account, pomb_anonymous;
+CREATE POLICY select_like ON pomb.like for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_like ON pomb.like for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_like ON pomb.like for UPDATE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_like ON pomb.like for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 
 commit;
