@@ -15,7 +15,7 @@ app.use(express.static("www")); // Our Ionic app build is in the www folder (kep
  */
 const pgConnection = {
   host: 'localhost',
-  user: 'pomb_anonymous',
+  user: 'pomb_admin',
   password: 'abc123',
   database: 'bclynch',
   port: 5432

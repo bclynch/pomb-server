@@ -8,6 +8,197 @@ create schema pomb_private;
 
 alter default privileges revoke execute on functions from public;
 
+-- *******************************************************************
+-- *********************** Audit Trigger *****************************
+-- *******************************************************************
+CREATE EXTENSION IF NOT EXISTS hstore;
+--
+-- Audited data. Lots of information is available, it's just a matter of how much
+-- you really want to record. See:
+--
+--   http://www.postgresql.org/docs/9.1/static/functions-info.html
+--
+-- Remember, every column you add takes up more audit table space and slows audit
+-- inserts.
+--
+-- Every index you add has a big impact too, so avoid adding indexes to the
+-- audit table unless you REALLY need them. The hstore GIST indexes are
+-- particularly expensive.
+--
+-- It is sometimes worth copying the audit table, or a coarse subset of it that
+-- you're interested in, into a temporary table where you CREATE any useful
+-- indexes and do your analysis.
+--
+CREATE TABLE pomb.logged_actions (
+    event_id bigserial primary key,
+    table_name text not null,
+    account_id integer,
+    session_user_name text,
+    action_tstamp_tx TIMESTAMP WITH TIME ZONE NOT NULL,
+    client_addr inet,
+    action TEXT NOT NULL CHECK (action IN ('I','D','U', 'T')),
+    row_data hstore,
+    changed_fields hstore
+);
+
+REVOKE ALL ON pomb.logged_actions FROM public;
+
+COMMENT ON TABLE pomb.logged_actions IS 'History of auditable actions on audited tables, from pomb_private.if_modified_func()';
+COMMENT ON COLUMN pomb.logged_actions.event_id IS 'Unique identifier for each auditable event';
+COMMENT ON COLUMN pomb.logged_actions.table_name IS 'Non-schema-qualified table name of table event occured in';
+COMMENT ON COLUMN pomb.logged_actions.account_id IS 'User performing the action';
+COMMENT ON COLUMN pomb.logged_actions.session_user_name IS 'Login / session user whose statement caused the audited event';
+COMMENT ON COLUMN pomb.logged_actions.action_tstamp_tx IS 'Transaction start timestamp for tx in which audited event occurred';
+COMMENT ON COLUMN pomb.logged_actions.client_addr IS 'IP address of client that issued query. Null for unix domain socket.';
+COMMENT ON COLUMN pomb.logged_actions.action IS 'Action type; I = insert, D = delete, U = update, T = truncate';
+COMMENT ON COLUMN pomb.logged_actions.row_data IS 'Record value. Null for statement-level trigger. For INSERT this is the new tuple. For DELETE and UPDATE it is the old tuple.';
+COMMENT ON COLUMN pomb.logged_actions.changed_fields IS 'New values of fields changed by UPDATE. Null except for row-level UPDATE events.';
+
+CREATE OR REPLACE FUNCTION pomb_private.if_modified_func() RETURNS TRIGGER AS $body$
+DECLARE
+    audit_row pomb.logged_actions;
+    include_values boolean;
+    log_diffs boolean;
+    h_old hstore;
+    h_new hstore;
+    excluded_cols text[] = ARRAY[]::text[];
+BEGIN
+    IF TG_WHEN <> 'AFTER' THEN
+        RAISE EXCEPTION 'pomb_private.if_modified_func() may only run as an AFTER trigger';
+    END IF;
+
+    audit_row = ROW(
+        nextval('pomb.logged_actions_event_id_seq'), -- event_id
+        TG_TABLE_NAME::text,                          -- table_name
+        current_setting('jwt.claims.account_id', true)::integer, -- account_id
+        session_user::text,                           -- session_user_name
+        current_timestamp,                            -- action_tstamp_tx
+        inet_client_addr(),                           -- client_addr
+        substring(TG_OP,1,1),                         -- action
+        NULL, NULL                                   -- row_data, changed_fields
+        );
+
+    IF TG_ARGV[1] IS NOT NULL THEN
+        excluded_cols = TG_ARGV[1]::text[];
+    END IF;
+    
+    IF (TG_OP = 'UPDATE' AND TG_LEVEL = 'ROW') THEN
+        audit_row.row_data = hstore(OLD.*) - excluded_cols;
+        audit_row.changed_fields =  (hstore(NEW.*) - audit_row.row_data) - excluded_cols;
+        IF audit_row.changed_fields = hstore('') THEN
+            -- All changed fields are ignored. Skip this update.
+            RETURN NULL;
+        END IF;
+    ELSIF (TG_OP = 'DELETE' AND TG_LEVEL = 'ROW') THEN
+        audit_row.row_data = hstore(OLD.*) - excluded_cols;
+    ELSIF (TG_OP = 'INSERT' AND TG_LEVEL = 'ROW') THEN
+        audit_row.row_data = hstore(NEW.*) - excluded_cols;
+    ELSE
+        RAISE EXCEPTION '[pomb_private.if_modified_func] - Trigger func added as trigger for unhandled case: %, %',TG_OP, TG_LEVEL;
+        RETURN NULL;
+    END IF;
+    INSERT INTO pomb.logged_actions VALUES (audit_row.*);
+    RETURN NULL;
+END;
+$body$
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog, public;
+
+
+COMMENT ON FUNCTION pomb_private.if_modified_func() IS $body$
+Track changes to a table at the statement and/or row level.
+
+Optional parameters to trigger in CREATE TRIGGER call:
+
+param 0: boolean, whether to log the query text. Default 't'.
+
+param 1: text[], columns to ignore in updates. Default [].
+
+         Updates to ignored cols are omitted from changed_fields.
+
+         Updates with only ignored cols changed are not inserted
+         into the audit log.
+
+         Almost all the processing work is still done for updates
+         that ignored. If you need to save the load, you need to use
+         WHEN clause on the trigger instead.
+
+         No warning or error is issued if ignored_cols contains columns
+         that do not exist in the target table. This lets you specify
+         a standard set of ignored columns.
+
+There is no parameter to disable logging of values. Add this trigger as
+a 'FOR EACH STATEMENT' rather than 'FOR EACH ROW' trigger if you do not
+want to log row values.
+
+Note that the user name logged is the login role for the session. The audit trigger
+cannot obtain the active role because it is reset by the SECURITY DEFINER invocation
+of the audit trigger its self.
+$body$;
+
+
+
+CREATE OR REPLACE FUNCTION pomb.audit_table(target_table regclass, audit_rows boolean, audit_query_text boolean, ignored_cols text[]) RETURNS void AS $body$
+DECLARE
+  stm_targets text = 'INSERT OR UPDATE OR DELETE OR TRUNCATE';
+  _q_txt text;
+  _ignored_cols_snip text = '';
+BEGIN
+    EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_row ON ' || quote_ident(target_table::TEXT);
+    EXECUTE 'DROP TRIGGER IF EXISTS audit_trigger_stm ON ' || quote_ident(target_table::TEXT);
+
+    IF audit_rows THEN
+        IF array_length(ignored_cols,1) > 0 THEN
+            _ignored_cols_snip = ', ' || quote_literal(ignored_cols);
+        END IF;
+        _q_txt = 'CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON ' || 
+                 quote_ident(target_table::TEXT) || 
+                 ' FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func(' ||
+                 quote_literal(audit_query_text) || _ignored_cols_snip || ');';
+        RAISE NOTICE '%',_q_txt;
+        EXECUTE _q_txt;
+        stm_targets = 'TRUNCATE';
+    ELSE
+    END IF;
+
+    _q_txt = 'CREATE TRIGGER audit_trigger_stm AFTER ' || stm_targets || ' ON ' ||
+             target_table ||
+             ' FOR EACH STATEMENT EXECUTE PROCEDURE pomb_private.if_modified_func('||
+             quote_literal(audit_query_text) || ');';
+    RAISE NOTICE '%',_q_txt;
+    EXECUTE _q_txt;
+
+END;
+$body$
+language 'plpgsql';
+
+COMMENT ON FUNCTION pomb.audit_table(regclass, boolean, boolean, text[]) IS $body$
+Add auditing support to a table.
+
+Arguments:
+   target_table:     Table name, schema qualified if not on search_path
+   audit_rows:       Record each row change, or only audit at a statement level
+   audit_query_text: Record the text of the client query that triggered the audit event?
+   ignored_cols:     Columns to exclude from update diffs, ignore updates that change only ignored cols.
+$body$;
+
+-- Pg doesn't allow variadic calls with 0 params, so provide a wrapper
+CREATE OR REPLACE FUNCTION pomb.audit_table(target_table regclass, audit_rows boolean, audit_query_text boolean) RETURNS void AS $body$
+SELECT pomb.audit_table($1, $2, $3, ARRAY[]::text[]);
+$body$ LANGUAGE SQL;
+
+-- And provide a convenience call wrapper for the simplest case
+-- of row-level logging with no excluded cols and query logging enabled.
+--
+CREATE OR REPLACE FUNCTION pomb.audit_table(target_table regclass) RETURNS void AS $body$
+SELECT pomb.audit_table($1, BOOLEAN 't', BOOLEAN 't');
+$body$ LANGUAGE 'sql';
+
+COMMENT ON FUNCTION pomb.audit_table(regclass) IS $body$
+Add auditing support to the given table. Row-level changes will be logged with full client query text. No cols are ignored.
+$body$;
+
 create table pomb.account (
   id                   serial primary key,
   username             text unique not null check (char_length(username) < 80),
@@ -22,6 +213,10 @@ create table pomb.account (
   created_at           bigint default (extract(epoch from now()) * 1000),
   updated_at           timestamp default now()
 );
+
+CREATE TRIGGER account_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.account
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.account (username, first_name, last_name, profile_photo, city, country, user_status, auto_update_location) values
   ('teeth-creep', 'Ms', 'D', 'https://laze-app.s3.amazonaws.com/19243203_10154776689779211_34706076750698170_o-w250-1509052127322.jpg', 'London', 'UK', 'Living the dream', true);
@@ -54,6 +249,10 @@ create table pomb.trip (
   created_at          bigint default (extract(epoch from now()) * 1000),
   updated_at          timestamp default now()
 );
+
+CREATE TRIGGER trip_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.trip
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.trip (user_id, name, description, start_date, end_date, start_lat, start_lon) values
   (1, 'Cool Trip', '<p><em><span style="font-size: 24px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 1</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 2</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p><h2>Section 3</h2><p><em><span style="font-size: 18px;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi sit amet pharetra magna. Nulla pretium, ligula eu ullamcorper volutpat, libero diam malesuada est, vel euismod sapien turpis bibendum nulla. Donec tincidunt sed mauris et auctor. Curabitur malesuada lectus id elit vehicula efficitur.</span></em></p>', 1508274574542, 1548282774542, 37.7749, -122.4194),
@@ -89,6 +288,10 @@ create table pomb.juncture (
   created_at          bigint default (extract(epoch from now()) * 1000),
   updated_at          timestamp default now()
 );
+
+CREATE TRIGGER juncture_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.juncture
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.juncture (user_id, trip_id, name, arrival_date, description, lat, lon, city, country, is_draft, marker_img) values
   (1, 1, 'Day 1', 1508274574542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 36.9741, -122.0308, 'Santa Cruz', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
@@ -137,6 +340,10 @@ create table pomb.post (
   updated_at          timestamp default now()
 );
 
+CREATE TRIGGER post_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.post
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
+
 insert into pomb.post (author, title, subtitle, content, trip_id, juncture_id, is_draft, is_scheduled, scheduled_date, is_published, published_date) values
   (1, 'Explore The World', 'Neat Info', '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris libero felis, maximus ut tincidunt a, consectetur in dolor. Pellentesque laoreet volutpat elit eget placerat. Pellentesque pretium molestie erat, vitae mollis urna dapibus a. Quisque eu aliquet metus. Aenean eget magna pharetra, mattis orci euismod, lobortis augue. Maecenas bibendum eros lorem, vitae pretium justo volutpat sit amet. Aenean varius odio magna, et pulvinar nulla sagittis a. Aliquam eleifend ac quam in pharetra. Praesent eu sem posuere, ultricies quam ullamcorper, eleifend est. In malesuada commodo eros non fringilla. Nulla aliquam diam et nisi pellentesque aliquet. Proin eu est commodo, molestie neque eu, faucibus leo.</p><p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque hendrerit risus nulla, at congue dolor bibendum ac. Maecenas condimentum, orci non fringilla venenatis, justo dolor pellentesque enim, sit amet laoreet lectus risus et enim. Quisque a fringilla ex. Nunc at felis mauris. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Cras suscipit purus porttitor porta vestibulum. Vestibulum sed ipsum sit amet arcu mattis congue vitae ac risus. Phasellus ac ultrices est. Maecenas ultrices eros ligula. Quisque placerat nisi tellus, vel auctor ligula pretium et. Nullam turpis odio, tincidunt non eleifend eu, cursus id lorem. Nam nibh sapien, eleifend quis massa eu, vulputate ullamcorper odio.</p><p><img src="https://localtvkdvr.files.wordpress.com/2017/05/may-snow-toby-the-bernese-mountain-dog-at-loveland.jpg?quality=85&strip=all&w=2000" style="width: 300px;" class="fr-fic fr-fil fr-dii">Aenean viverra turpis urna, et pellentesque orci posuere non. Pellentesque quis condimentum risus, non mattis nulla. Integer posuere egestas elit, vitae semper libero blandit at. Aenean vehicula tortor nec leo accumsan lobortis. Pellentesque vitae eros non felis fermentum vehicula eu in libero. Etiam sed tortor id odio consequat tincidunt. Maecenas eu nibh maximus odio pulvinar tempus. Mauris ipsum neque, congue in laoreet eu, gravida ac dui. Nunc aliquet elit nec urna sagittis fermentum. Sed vehicula in leo a luctus. Sed commodo magna justo, sit amet aliquet odio mattis quis. Praesent eget vehicula erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel ipsum enim. Nulla facilisi.</p><p>Phasellus interdum felis sit amet finibus consectetur. Vivamus eget odio vel augue maximus finibus. Vestibulum fringilla lorem id lobortis convallis. Phasellus pharetra metus nec vulputate dapibus. Nunc id est mi. Vivamus placerat, diam sit amet sodales commodo, massa dolor euismod tortor, ut condimentum orci lectus ac ex. Ut mollis ex ut est euismod rhoncus. Quisque ut lobortis risus, a sodales diam. Maecenas vitae bibendum est, eget tincidunt lacus. Donec laoreet felis sed orci maximus, id consequat augue faucibus. In libero erat, porttitor vitae nunc id, dapibus sollicitudin nisl. Ut a pharetra neque, at molestie eros. Aliquam malesuada est rutrum nunc commodo, in eleifend nisl vestibulum.</p><p>Vestibulum id lacus rutrum, tristique lectus a, vestibulum odio. Nam dictum dui at urna pretium sodales. Nullam tristique nisi eget faucibus consequat. Etiam pretium arcu sed dapibus tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dictum vitae sapien suscipit dictum. In hac habitasse platea dictumst. Suspendisse risus dui, mattis ac malesuada efficitur, scelerisque vitae diam. Nam eu neque vel ex pharetra consequat vitae in justo. Phasellus convallis enim non est vulputate scelerisque. Duis id sagittis leo. Cras molestie tincidunt nisi, ac scelerisque est egestas vitae. Fusce mollis tempus dui in aliquet. Duis ipsum sem, ultricies nec risus nec, aliquet hendrerit neque. Integer accumsan varius iaculis.</p><p>Aliquam pharetra fringilla lectus sed placerat. Donec iaculis libero non sem maximus, id scelerisque arcu laoreet. Sed tempus eros sit amet justo posuere mollis. Etiam commodo semper felis maximus porttitor. Fusce ut molestie massa. Phasellus sem enim, tristique quis lorem id, maximus accumsan sapien. Aenean feugiat luctus ligula, vel tristique nunc convallis eget.</p><p>Ut facilisis tortor turpis, ac feugiat nunc egestas eget. Ut tincidunt ex nisi, eu egestas purus interdum in. Pellentesque ornare commodo turpis vitae aliquam. Etiam ornare cursus elit, in feugiat mauris ornare vitae. Morbi mollis molestie lacus, non pulvinar quam. Quisque eleifend sed erat id congue. Vivamus vulputate tempus tortor, a gravida justo dictum id. Proin tristique, neque id viverra accumsan, leo erat mattis sem, at porttitor nisi enim non risus. Nunc pharetra velit ut condimentum porta. Fusce consectetur id lectus quis vulputate. Nunc congue rutrum diam, at sodales magna malesuada iaculis. Aenean nec facilisis nulla, vestibulum eleifend purus.<img src="https://i.froala.com/assets/photo2.jpg" data-id="2" data-type="image" data-name="Image 2017-08-07 at 16:08:48.jpg" style="width: 300px;" class="fr-fic fr-dii hoverZoomLink fr-fir"></p><p>Morbi eget dolor sed velit pharetra placerat. Duis justo dui, feugiat eu diam ut, rutrum pellentesque urna. Praesent mattis tellus nec congue auctor. Fusce condimentum in sem at rhoncus. Mauris nec erat lacinia ligula viverra congue eget sit amet tellus. Aenean aliquet fermentum velit. Vivamus ut odio vel dolor mattis interdum. Nunc ullamcorper ex quis arcu tincidunt, sed accumsan massa rutrum. In at urna laoreet enim auctor consectetur ac eu justo. Curabitur porta turpis eget purus interdum scelerisque. Nunc dignissim aliquam sagittis. Suspendisse feugiat velit semper, condimentum magna vel, mollis neque. Maecenas sed lectus vel mi fringilla vehicula sit amet sed risus. Morbi posuere tincidunt magna nec interdum.</p><p>Mauris non cursus nisi, id semper quam. Aliquam auctor, est nec fringilla egestas, nisi orci varius sem, molestie faucibus est nulla ut tellus. Pellentesque in massa facilisis, sollicitudin elit nec, interdum ipsum. Maecenas pellentesque, orci sit amet auctor volutpat, mi lectus hendrerit arcu, nec pharetra justo justo et justo. Etiam feugiat dolor nisi, bibendum egestas leo auctor ut. Suspendisse dapibus quis purus nec pretium. Proin gravida orci et porta vestibulum. Cras ut sem in ante dignissim elementum vehicula id augue. Donec purus augue, dapibus in justo ut, posuere mollis felis. Nunc iaculis urna dolor, sollicitudin aliquam eros mattis placerat. Ut eget turpis ut dui ullamcorper ultricies a eget ex. Integer vitae lorem vel metus dignissim volutpat. Mauris tincidunt faucibus tellus, quis mollis libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Duis viverra efficitur libero eget luctus. Aenean dapibus sodales diam, posuere dictum erat rhoncus et. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam ligula ex, tincidunt sed enim eget, accumsan luctus nulla. Mauris ac consequat nunc, et ultrices ipsum. Integer nec venenatis est. Vestibulum dapibus, velit nec efficitur posuere, urna enim pretium quam, sit amet malesuada orci nibh sed metus. Nulla nec eros felis. Sed imperdiet mauris id egestas suscipit. Nunc interdum laoreet maximus. Nunc congue sapien ultricies, pretium est nec, laoreet sem. Fusce ornare tortor massa, ac vestibulum enim gravida nec.</p>', 1, 1, false, false, null, true, 1495726380000),
   (1, 'Lose Your Way? Find a Beer', 'No Bud Light though', '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris libero felis, maximus ut tincidunt a, consectetur in dolor. Pellentesque laoreet volutpat elit eget placerat. Pellentesque pretium molestie erat, vitae mollis urna dapibus a. Quisque eu aliquet metus. Aenean eget magna pharetra, mattis orci euismod, lobortis augue. Maecenas bibendum eros lorem, vitae pretium justo volutpat sit amet. Aenean varius odio magna, et pulvinar nulla sagittis a. Aliquam eleifend ac quam in pharetra. Praesent eu sem posuere, ultricies quam ullamcorper, eleifend est. In malesuada commodo eros non fringilla. Nulla aliquam diam et nisi pellentesque aliquet. Proin eu est commodo, molestie neque eu, faucibus leo.</p><p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Quisque hendrerit risus nulla, at congue dolor bibendum ac. Maecenas condimentum, orci non fringilla venenatis, justo dolor pellentesque enim, sit amet laoreet lectus risus et enim. Quisque a fringilla ex. Nunc at felis mauris. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Cras suscipit purus porttitor porta vestibulum. Vestibulum sed ipsum sit amet arcu mattis congue vitae ac risus. Phasellus ac ultrices est. Maecenas ultrices eros ligula. Quisque placerat nisi tellus, vel auctor ligula pretium et. Nullam turpis odio, tincidunt non eleifend eu, cursus id lorem. Nam nibh sapien, eleifend quis massa eu, vulputate ullamcorper odio.</p><p><img src="https://localtvkdvr.files.wordpress.com/2017/05/may-snow-toby-the-bernese-mountain-dog-at-loveland.jpg?quality=85&strip=all&w=2000" style="width: 300px;" class="fr-fic fr-fil fr-dii">Aenean viverra turpis urna, et pellentesque orci posuere non. Pellentesque quis condimentum risus, non mattis nulla. Integer posuere egestas elit, vitae semper libero blandit at. Aenean vehicula tortor nec leo accumsan lobortis. Pellentesque vitae eros non felis fermentum vehicula eu in libero. Etiam sed tortor id odio consequat tincidunt. Maecenas eu nibh maximus odio pulvinar tempus. Mauris ipsum neque, congue in laoreet eu, gravida ac dui. Nunc aliquet elit nec urna sagittis fermentum. Sed vehicula in leo a luctus. Sed commodo magna justo, sit amet aliquet odio mattis quis. Praesent eget vehicula erat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam vel ipsum enim. Nulla facilisi.</p><p>Phasellus interdum felis sit amet finibus consectetur. Vivamus eget odio vel augue maximus finibus. Vestibulum fringilla lorem id lobortis convallis. Phasellus pharetra metus nec vulputate dapibus. Nunc id est mi. Vivamus placerat, diam sit amet sodales commodo, massa dolor euismod tortor, ut condimentum orci lectus ac ex. Ut mollis ex ut est euismod rhoncus. Quisque ut lobortis risus, a sodales diam. Maecenas vitae bibendum est, eget tincidunt lacus. Donec laoreet felis sed orci maximus, id consequat augue faucibus. In libero erat, porttitor vitae nunc id, dapibus sollicitudin nisl. Ut a pharetra neque, at molestie eros. Aliquam malesuada est rutrum nunc commodo, in eleifend nisl vestibulum.</p><p>Vestibulum id lacus rutrum, tristique lectus a, vestibulum odio. Nam dictum dui at urna pretium sodales. Nullam tristique nisi eget faucibus consequat. Etiam pretium arcu sed dapibus tincidunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus dictum vitae sapien suscipit dictum. In hac habitasse platea dictumst. Suspendisse risus dui, mattis ac malesuada efficitur, scelerisque vitae diam. Nam eu neque vel ex pharetra consequat vitae in justo. Phasellus convallis enim non est vulputate scelerisque. Duis id sagittis leo. Cras molestie tincidunt nisi, ac scelerisque est egestas vitae. Fusce mollis tempus dui in aliquet. Duis ipsum sem, ultricies nec risus nec, aliquet hendrerit neque. Integer accumsan varius iaculis.</p><p>Aliquam pharetra fringilla lectus sed placerat. Donec iaculis libero non sem maximus, id scelerisque arcu laoreet. Sed tempus eros sit amet justo posuere mollis. Etiam commodo semper felis maximus porttitor. Fusce ut molestie massa. Phasellus sem enim, tristique quis lorem id, maximus accumsan sapien. Aenean feugiat luctus ligula, vel tristique nunc convallis eget.</p><p>Ut facilisis tortor turpis, ac feugiat nunc egestas eget. Ut tincidunt ex nisi, eu egestas purus interdum in. Pellentesque ornare commodo turpis vitae aliquam. Etiam ornare cursus elit, in feugiat mauris ornare vitae. Morbi mollis molestie lacus, non pulvinar quam. Quisque eleifend sed erat id congue. Vivamus vulputate tempus tortor, a gravida justo dictum id. Proin tristique, neque id viverra accumsan, leo erat mattis sem, at porttitor nisi enim non risus. Nunc pharetra velit ut condimentum porta. Fusce consectetur id lectus quis vulputate. Nunc congue rutrum diam, at sodales magna malesuada iaculis. Aenean nec facilisis nulla, vestibulum eleifend purus.<img src="https://i.froala.com/assets/photo2.jpg" data-id="2" data-type="image" data-name="Image 2017-08-07 at 16:08:48.jpg" style="width: 300px;" class="fr-fic fr-dii hoverZoomLink fr-fir"></p><p>Morbi eget dolor sed velit pharetra placerat. Duis justo dui, feugiat eu diam ut, rutrum pellentesque urna. Praesent mattis tellus nec congue auctor. Fusce condimentum in sem at rhoncus. Mauris nec erat lacinia ligula viverra congue eget sit amet tellus. Aenean aliquet fermentum velit. Vivamus ut odio vel dolor mattis interdum. Nunc ullamcorper ex quis arcu tincidunt, sed accumsan massa rutrum. In at urna laoreet enim auctor consectetur ac eu justo. Curabitur porta turpis eget purus interdum scelerisque. Nunc dignissim aliquam sagittis. Suspendisse feugiat velit semper, condimentum magna vel, mollis neque. Maecenas sed lectus vel mi fringilla vehicula sit amet sed risus. Morbi posuere tincidunt magna nec interdum.</p><p>Mauris non cursus nisi, id semper quam. Aliquam auctor, est nec fringilla egestas, nisi orci varius sem, molestie faucibus est nulla ut tellus. Pellentesque in massa facilisis, sollicitudin elit nec, interdum ipsum. Maecenas pellentesque, orci sit amet auctor volutpat, mi lectus hendrerit arcu, nec pharetra justo justo et justo. Etiam feugiat dolor nisi, bibendum egestas leo auctor ut. Suspendisse dapibus quis purus nec pretium. Proin gravida orci et porta vestibulum. Cras ut sem in ante dignissim elementum vehicula id augue. Donec purus augue, dapibus in justo ut, posuere mollis felis. Nunc iaculis urna dolor, sollicitudin aliquam eros mattis placerat. Ut eget turpis ut dui ullamcorper ultricies a eget ex. Integer vitae lorem vel metus dignissim volutpat. Mauris tincidunt faucibus tellus, quis mollis libero. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p><p>Duis viverra efficitur libero eget luctus. Aenean dapibus sodales diam, posuere dictum erat rhoncus et. Interdum et malesuada fames ac ante ipsum primis in faucibus. Nullam ligula ex, tincidunt sed enim eget, accumsan luctus nulla. Mauris ac consequat nunc, et ultrices ipsum. Integer nec venenatis est. Vestibulum dapibus, velit nec efficitur posuere, urna enim pretium quam, sit amet malesuada orci nibh sed metus. Nulla nec eros felis. Sed imperdiet mauris id egestas suscipit. Nunc interdum laoreet maximus. Nunc congue sapien ultricies, pretium est nec, laoreet sem. Fusce ornare tortor massa, ac vestibulum enim gravida nec.</p>', 1, 1, false, false, null, true, 1295726380000),
@@ -171,6 +378,10 @@ create table pomb.post_tag (
   name                text primary key,
   tag_description     text
 );
+
+CREATE TRIGGER post_tag_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.post_tag
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.post_tag (name, tag_description) values
   ('colombia', 'What was once a haven for drugs and violence, Colombia has become a premiere destination for those who seek adventure, beauty, and intrepid charm.'),
@@ -232,6 +443,10 @@ create table pomb.coords (
   coord_time          timestamp
 );
 
+CREATE TRIGGER coords_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.coords
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
+
 comment on table pomb.coords is 'Table with POMB juncture coordinates';
 comment on column pomb.coords.id is 'Primary id for coordinates';
 comment on column pomb.coords.juncture_id is 'Foreign key to referred juncture';
@@ -245,6 +460,10 @@ create table pomb.email_list (
   email               text not null unique check (char_length(email) < 256),
   created_at          bigint default (extract(epoch from now()) * 1000)
 );
+
+CREATE TRIGGER email_list_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.email_list
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 comment on table pomb.email_list is 'Table with POMB list of emails';
 comment on column pomb.email_list.id is 'Primary id for email';
@@ -272,6 +491,10 @@ create table pomb.image (
   created_at          bigint default (extract(epoch from now()) * 1000),
   updated_at          timestamp default now()
 );
+
+CREATE TRIGGER image_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.image
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.image (trip_id, juncture_id, post_id, user_id, type, url, title, description) values
   (1, 1, 1, 1, 'leadLarge', 'http://images.singletracks.com/blog/wp-content/uploads/2016/06/Scale-Action-Image-2017-BIKE-SCOTT-Sports_9-1200x800.jpg', 'Dat photo title', 'Colombia commentary'),
@@ -344,6 +567,10 @@ create table pomb.like (
   created_at          bigint default (extract(epoch from now()) * 1000)
 );
 
+CREATE TRIGGER like_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.like
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
+
 insert into pomb.like (trip_id, juncture_id, post_id, image_id, user_id) values
   (1, null, null, null, 1),
   (null, 1, null, null, 1),
@@ -361,6 +588,25 @@ comment on column pomb.like.created_at is 'Time like created at';
 
 alter table pomb.like enable row level security;
 
+create table pomb.track (
+  id                  serial primary key,
+  user_id             integer not null references pomb.account(id) on delete cascade,
+  track_user_id       integer not null references pomb.account(id) on delete cascade,
+  created_at          bigint default (extract(epoch from now()) * 1000)
+);
+
+CREATE TRIGGER track_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.track
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
+
+comment on table pomb.track is 'Table with connection between users to track/follow other users';
+comment on column pomb.track.id is 'Primary id for the track';
+comment on column pomb.track.user_id is 'Primary id of user who is going to track';
+comment on column pomb.track.track_user_id is 'Primary id user who will be tracked';
+comment on column pomb.track.created_at is 'Time track created at';
+
+alter table pomb.track enable row level security;
+
 create table pomb.config (
   id                  serial primary key,
   primary_color       text not null check (char_length(primary_color) < 20),
@@ -373,6 +619,10 @@ create table pomb.config (
   featured_trip_1     integer not null references pomb.trip(id),
   updated_at          timestamp default now()
 );
+
+CREATE TRIGGER config_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb.config
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.config (primary_color, secondary_color, tagline, hero_banner, featured_story_1, featured_story_2, featured_story_3, featured_trip_1) values
   ('#e1ff00', '#04c960', 'For wherever the road takes you', 'http://www.pinnaclepellet.com/images/1200x300-deep-forest.jpg', 4, 8, 13, 1);
@@ -546,6 +796,10 @@ create table pomb_private.user_account (
   email               text not null unique check (email ~* '^.+@.+\..+$'),
   password_hash       text not null
 );
+
+CREATE TRIGGER user_account_INSERT_UPDATE_DELETE
+AFTER INSERT OR UPDATE OR DELETE ON pomb_private.user_account
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 comment on table pomb_private.user_account is 'Private information about a user’s account.';
 comment on column pomb_private.user_account.account_id is 'The id of the user associated with this account.';
@@ -775,6 +1029,17 @@ CREATE POLICY insert_like ON pomb.like for INSERT TO pomb_account
 CREATE POLICY update_like ON pomb.like for UPDATE TO pomb_account
   USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 CREATE POLICY delete_like ON pomb.like for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+
+-- Tracking policy
+GRANT ALL ON TABLE pomb.track TO pomb_account, pomb_anonymous;
+CREATE POLICY select_track ON pomb.track for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_track ON pomb.track for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY update_track ON pomb.track for UPDATE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_track ON pomb.track for DELETE TO pomb_account
   USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 
 commit;
