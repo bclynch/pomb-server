@@ -1,5 +1,6 @@
 const express = require('express'),
 router = express.Router(),
+fs = require('fs'),
 nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
@@ -30,7 +31,7 @@ function sendToUsers(options, usersArr) {
   });
 }
 
-// Route 
+// Routes
 router.post("/send-newsletter", (req, res) => {
 
   // setup e-mail data, even with unicode symbols
@@ -60,6 +61,23 @@ router.post('/reset', (req, res) => {
     if (error) res.send({ error });
     console.log('MESSAGE: ', info.response);
     res.send({ result: 'Forgot email sent' })
+  });
+});
+
+router.post('/registration', (req, res) => {
+  const template = fs.readFileSync('./emailTemplates/POMB Welcome.html', { encoding:'utf-8' });
+
+  const mailOptions = {
+    to: req.body.user,
+    from: '"Pack On My Back " <bot@packonmyback.com>',
+    subject: 'Welcome To Pack On My Back',
+    html: template
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) res.send({ error });
+    console.log('MESSAGE: ', info.response);
+    res.send({ result: 'New registration email sent' })
   });
 });
 

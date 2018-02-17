@@ -2,7 +2,8 @@ const express = require('express'),
 bodyParser = require('body-parser'),
 cors = require('cors'),
 app = express(),
-postgraphql = require('postgraphql').postgraphql;
+postgraphql = require('postgraphql').postgraphql,
+PostGraphileConnectionFilterPlugin = require('postgraphile-plugin-connection-filter');
 
 app.use(bodyParser.json({limit: '50mb'}));
 app.set('port', process.env.PORT || 8080);
@@ -22,6 +23,7 @@ const pgConnection = {
 };
 const postgraphqlConfig = {
   graphiql: true,
+  appendPlugins: [PostGraphileConnectionFilterPlugin],
   jwtSecret: 'some-secret', 
   jwtPgTypeIdentifier: 'pomb.jwt_token'
 };

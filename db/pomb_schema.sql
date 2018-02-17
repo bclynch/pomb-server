@@ -294,16 +294,16 @@ AFTER INSERT OR UPDATE OR DELETE ON pomb.juncture
 FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 
 insert into pomb.juncture (user_id, trip_id, name, arrival_date, description, lat, lon, city, country, is_draft, marker_img) values
-  (1, 1, 'Day 1', 1508274574542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 36.9741, -122.0308, 'Santa Cruz', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 2', 1508274774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 37.7749, -122.4194, 'San Francisco', 'United States', true, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 3', 1508278774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 37.9735, -122.5311, 'San Rafael', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 4', 1508278874542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 38.4741, -119.0308, 'Whichman', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 5', 1528279074542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 38.7749, -118.4194, 'Walter Lake', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 6', 1528279874542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 39.9735, -110.5311, 'Myron', 'United States', false, null),
-  (1, 1, 'Day 7', 1538280574542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 40.9741, -108.0308, 'Baggs', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 8', 1538281674542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 41.7749, -108.4194, 'Rock Springs', 'United States', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
-  (1, 1, 'Day 9', 1548282774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 39.9735, -114.5311, 'Cherry Creek', 'United States', false, null),
-  (1, 2, 'So it begins', 1408274584542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 4.7110, -74.0721, 'Medellin', 'Colombia', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png');
+  (1, 1, 'Day 1', 1508274574542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 36.9741, -122.0308, 'Santa Cruz', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 2', 1508274774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 37.7749, -122.4194, 'San Francisco', 'US', true, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 3', 1508278774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 37.9735, -122.5311, 'San Rafael', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 4', 1508278874542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 38.4741, -119.0308, 'Whichman', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 5', 1528279074542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 38.7749, -118.4194, 'Walter Lake', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 6', 1528279874542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 39.9735, -110.5311, 'Myron', 'US', false, null),
+  (1, 1, 'Day 7', 1538280574542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 40.9741, -108.0308, 'Baggs', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 8', 1538281674542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 41.7749, -108.4194, 'Rock Springs', 'US', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png'),
+  (1, 1, 'Day 9', 1548282774542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 39.9735, -114.5311, 'Cherry Creek', 'US', false, null),
+  (1, 2, 'So it begins', 1408274584542, 'Proin pulvinar non leo sit amet tempor. Curabitur auctor, justo in ullamcorper posuere, velit arcu scelerisque nisl, sit amet vulputate urna est vel mi. Mauris eleifend dolor sit amet tempus eleifend. Aliquam finibus nisl a tortor consequat, quis rhoncus nunc consectetur. Duis velit dui, aliquam id dictum at, molestie sed arcu. Ut imperdiet mauris elit. Integer maximus, augue eu iaculis tempus, nisl libero faucibus magna, et ultricies sem est vitae erat. Phasellus vitae pulvinar lorem. Sed consectetur eu quam non blandit. Ut tincidunt lacus sed tortor ultrices, et laoreet purus ornare. Donec vestibulum metus a ullamcorper iaculis. Donec fermentum est metus, non scelerisque risus vestibulum ac. Suspendisse euismod volutpat nisl vitae euismod. Duis convallis, est id ornare malesuada, lorem urna mattis risus, eu semper elit sem fringilla risus. Nunc porta, sapien sit amet accumsan fermentum, augue nulla congue diam, et lobortis ante ante eget est. Mauris placerat nisl id consequat laoreet.', 4.7110, -74.0721, 'Medellin', 'CO', false, 'https://packonmyback.s3.amazonaws.com/WP_20150721_08_47_08_Pro__highres-marker-1515559581861.png');
 
 comment on table pomb.juncture is 'Table with POMB junctures';
 comment on column pomb.juncture.id is 'Primary id for juncture';
@@ -315,7 +315,7 @@ comment on column pomb.juncture.description is 'Description of the juncture';
 comment on column pomb.juncture.lat is 'Latitude of the juncture';
 comment on column pomb.juncture.lon is 'Longitude of the juncture';
 comment on column pomb.juncture.city is 'City of the juncture';
-comment on column pomb.juncture.country is 'Country of the juncture';
+comment on column pomb.juncture.country is 'Country code of the juncture';
 comment on column pomb.juncture.is_draft is 'Whether the juncture should be published or not';
 comment on column pomb.juncture.marker_img is 'Image to be used for markers on our map';
 comment on column pomb.juncture.created_at is 'When juncture created';
@@ -627,18 +627,291 @@ FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
 insert into pomb.config (primary_color, secondary_color, tagline, hero_banner, featured_story_1, featured_story_2, featured_story_3, featured_trip_1) values
   ('#e1ff00', '#04c960', 'For wherever the road takes you', 'http://www.pinnaclepellet.com/images/1200x300-deep-forest.jpg', 4, 8, 13, 1);
 
-comment on table pomb.config is 'Table with POMB config';
-comment on column pomb.config.id is 'Id for config';
-comment on column pomb.config.primary_color is 'Primary color for site';
-comment on column pomb.config.secondary_color is 'Secondary color for site';
-comment on column pomb.config.tagline is 'Tagline of site';
-comment on column pomb.config.hero_banner is 'Hero banner url';
-comment on column pomb.config.featured_story_1 is 'Featured story for nav';
-comment on column pomb.config.featured_story_2 is 'Featured story for nav';
-comment on column pomb.config.featured_story_3 is 'Featured story for nav';
-comment on column pomb.config.featured_trip_1 is 'Featured trip for nav';
-comment on column pomb.config.updated_at is 'Last updated';
 
+CREATE TABLE pomb.country (code VARCHAR(10) NOT NULL, name VARCHAR(64) NOT NULL, PRIMARY KEY(code));
+
+INSERT INTO pomb.country (code, name) VALUES (E'AF', E'Afghanistan');
+INSERT INTO pomb.country (code, name) VALUES (E'AX', E'Åland Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'AL', E'Albania');
+INSERT INTO pomb.country (code, name) VALUES (E'DZ', E'Algeria');
+INSERT INTO pomb.country (code, name) VALUES (E'AS', E'American Samoa');
+INSERT INTO pomb.country (code, name) VALUES (E'AD', E'Andorra');
+INSERT INTO pomb.country (code, name) VALUES (E'AO', E'Angola');
+INSERT INTO pomb.country (code, name) VALUES (E'AI', E'Anguilla');
+INSERT INTO pomb.country (code, name) VALUES (E'AQ', E'Antarctica');
+INSERT INTO pomb.country (code, name) VALUES (E'AG', E'Antigua & Barbuda');
+INSERT INTO pomb.country (code, name) VALUES (E'AR', E'Argentina');
+INSERT INTO pomb.country (code, name) VALUES (E'AM', E'Armenia');
+INSERT INTO pomb.country (code, name) VALUES (E'AW', E'Aruba');
+INSERT INTO pomb.country (code, name) VALUES (E'AC', E'Ascension Island');
+INSERT INTO pomb.country (code, name) VALUES (E'AU', E'Australia');
+INSERT INTO pomb.country (code, name) VALUES (E'AT', E'Austria');
+INSERT INTO pomb.country (code, name) VALUES (E'AZ', E'Azerbaijan');
+INSERT INTO pomb.country (code, name) VALUES (E'BS', E'Bahamas');
+INSERT INTO pomb.country (code, name) VALUES (E'BH', E'Bahrain');
+INSERT INTO pomb.country (code, name) VALUES (E'BD', E'Bangladesh');
+INSERT INTO pomb.country (code, name) VALUES (E'BB', E'Barbados');
+INSERT INTO pomb.country (code, name) VALUES (E'BY', E'Belarus');
+INSERT INTO pomb.country (code, name) VALUES (E'BE', E'Belgium');
+INSERT INTO pomb.country (code, name) VALUES (E'BZ', E'Belize');
+INSERT INTO pomb.country (code, name) VALUES (E'BJ', E'Benin');
+INSERT INTO pomb.country (code, name) VALUES (E'BM', E'Bermuda');
+INSERT INTO pomb.country (code, name) VALUES (E'BT', E'Bhutan');
+INSERT INTO pomb.country (code, name) VALUES (E'BO', E'Bolivia');
+INSERT INTO pomb.country (code, name) VALUES (E'BA', E'Bosnia & Herzegovina');
+INSERT INTO pomb.country (code, name) VALUES (E'BW', E'Botswana');
+INSERT INTO pomb.country (code, name) VALUES (E'BR', E'Brazil');
+INSERT INTO pomb.country (code, name) VALUES (E'IO', E'British Indian Ocean Territory');
+INSERT INTO pomb.country (code, name) VALUES (E'VG', E'British Virgin Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'BN', E'Brunei');
+INSERT INTO pomb.country (code, name) VALUES (E'BG', E'Bulgaria');
+INSERT INTO pomb.country (code, name) VALUES (E'BF', E'Burkina Faso');
+INSERT INTO pomb.country (code, name) VALUES (E'BI', E'Burundi');
+INSERT INTO pomb.country (code, name) VALUES (E'KH', E'Cambodia');
+INSERT INTO pomb.country (code, name) VALUES (E'CM', E'Cameroon');
+INSERT INTO pomb.country (code, name) VALUES (E'CA', E'Canada');
+INSERT INTO pomb.country (code, name) VALUES (E'IC', E'Canary Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'CV', E'Cape Verde');
+INSERT INTO pomb.country (code, name) VALUES (E'BQ', E'Caribbean Netherlands');
+INSERT INTO pomb.country (code, name) VALUES (E'KY', E'Cayman Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'CF', E'Central African Republic');
+INSERT INTO pomb.country (code, name) VALUES (E'EA', E'Ceuta & Melilla');
+INSERT INTO pomb.country (code, name) VALUES (E'TD', E'Chad');
+INSERT INTO pomb.country (code, name) VALUES (E'CL', E'Chile');
+INSERT INTO pomb.country (code, name) VALUES (E'CN', E'China');
+INSERT INTO pomb.country (code, name) VALUES (E'CX', E'Christmas Island');
+INSERT INTO pomb.country (code, name) VALUES (E'CC', E'Cocos (Keeling) Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'CO', E'Colombia');
+INSERT INTO pomb.country (code, name) VALUES (E'KM', E'Comoros');
+INSERT INTO pomb.country (code, name) VALUES (E'CG', E'Congo - Brazzaville');
+INSERT INTO pomb.country (code, name) VALUES (E'CD', E'Congo - Kinshasa');
+INSERT INTO pomb.country (code, name) VALUES (E'CK', E'Cook Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'CR', E'Costa Rica');
+INSERT INTO pomb.country (code, name) VALUES (E'CI', E'Côte d’Ivoire');
+INSERT INTO pomb.country (code, name) VALUES (E'HR', E'Croatia');
+INSERT INTO pomb.country (code, name) VALUES (E'CU', E'Cuba');
+INSERT INTO pomb.country (code, name) VALUES (E'CW', E'Curaçao');
+INSERT INTO pomb.country (code, name) VALUES (E'CY', E'Cyprus');
+INSERT INTO pomb.country (code, name) VALUES (E'CZ', E'Czechia');
+INSERT INTO pomb.country (code, name) VALUES (E'DK', E'Denmark');
+INSERT INTO pomb.country (code, name) VALUES (E'DG', E'Diego Garcia');
+INSERT INTO pomb.country (code, name) VALUES (E'DJ', E'Djibouti');
+INSERT INTO pomb.country (code, name) VALUES (E'DM', E'Dominica');
+INSERT INTO pomb.country (code, name) VALUES (E'DO', E'Dominican Republic');
+INSERT INTO pomb.country (code, name) VALUES (E'EC', E'Ecuador');
+INSERT INTO pomb.country (code, name) VALUES (E'EG', E'Egypt');
+INSERT INTO pomb.country (code, name) VALUES (E'SV', E'El Salvador');
+INSERT INTO pomb.country (code, name) VALUES (E'GQ', E'Equatorial Guinea');
+INSERT INTO pomb.country (code, name) VALUES (E'ER', E'Eritrea');
+INSERT INTO pomb.country (code, name) VALUES (E'EE', E'Estonia');
+INSERT INTO pomb.country (code, name) VALUES (E'ET', E'Ethiopia');
+INSERT INTO pomb.country (code, name) VALUES (E'EZ', E'Eurozone');
+INSERT INTO pomb.country (code, name) VALUES (E'FK', E'Falkland Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'FO', E'Faroe Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'FJ', E'Fiji');
+INSERT INTO pomb.country (code, name) VALUES (E'FI', E'Finland');
+INSERT INTO pomb.country (code, name) VALUES (E'FR', E'France');
+INSERT INTO pomb.country (code, name) VALUES (E'GF', E'French Guiana');
+INSERT INTO pomb.country (code, name) VALUES (E'PF', E'French Polynesia');
+INSERT INTO pomb.country (code, name) VALUES (E'TF', E'French Southern Territories');
+INSERT INTO pomb.country (code, name) VALUES (E'GA', E'Gabon');
+INSERT INTO pomb.country (code, name) VALUES (E'GM', E'Gambia');
+INSERT INTO pomb.country (code, name) VALUES (E'GE', E'Georgia');
+INSERT INTO pomb.country (code, name) VALUES (E'DE', E'Germany');
+INSERT INTO pomb.country (code, name) VALUES (E'GH', E'Ghana');
+INSERT INTO pomb.country (code, name) VALUES (E'GI', E'Gibraltar');
+INSERT INTO pomb.country (code, name) VALUES (E'GR', E'Greece');
+INSERT INTO pomb.country (code, name) VALUES (E'GL', E'Greenland');
+INSERT INTO pomb.country (code, name) VALUES (E'GD', E'Grenada');
+INSERT INTO pomb.country (code, name) VALUES (E'GP', E'Guadeloupe');
+INSERT INTO pomb.country (code, name) VALUES (E'GU', E'Guam');
+INSERT INTO pomb.country (code, name) VALUES (E'GT', E'Guatemala');
+INSERT INTO pomb.country (code, name) VALUES (E'GG', E'Guernsey');
+INSERT INTO pomb.country (code, name) VALUES (E'GN', E'Guinea');
+INSERT INTO pomb.country (code, name) VALUES (E'GW', E'Guinea-Bissau');
+INSERT INTO pomb.country (code, name) VALUES (E'GY', E'Guyana');
+INSERT INTO pomb.country (code, name) VALUES (E'HT', E'Haiti');
+INSERT INTO pomb.country (code, name) VALUES (E'HN', E'Honduras');
+INSERT INTO pomb.country (code, name) VALUES (E'HK', E'Hong Kong SAR China');
+INSERT INTO pomb.country (code, name) VALUES (E'HU', E'Hungary');
+INSERT INTO pomb.country (code, name) VALUES (E'IS', E'Iceland');
+INSERT INTO pomb.country (code, name) VALUES (E'IN', E'India');
+INSERT INTO pomb.country (code, name) VALUES (E'ID', E'Indonesia');
+INSERT INTO pomb.country (code, name) VALUES (E'IR', E'Iran');
+INSERT INTO pomb.country (code, name) VALUES (E'IQ', E'Iraq');
+INSERT INTO pomb.country (code, name) VALUES (E'IE', E'Ireland');
+INSERT INTO pomb.country (code, name) VALUES (E'IM', E'Isle of Man');
+INSERT INTO pomb.country (code, name) VALUES (E'IL', E'Israel');
+INSERT INTO pomb.country (code, name) VALUES (E'IT', E'Italy');
+INSERT INTO pomb.country (code, name) VALUES (E'JM', E'Jamaica');
+INSERT INTO pomb.country (code, name) VALUES (E'JP', E'Japan');
+INSERT INTO pomb.country (code, name) VALUES (E'JE', E'Jersey');
+INSERT INTO pomb.country (code, name) VALUES (E'JO', E'Jordan');
+INSERT INTO pomb.country (code, name) VALUES (E'KZ', E'Kazakhstan');
+INSERT INTO pomb.country (code, name) VALUES (E'KE', E'Kenya');
+INSERT INTO pomb.country (code, name) VALUES (E'KI', E'Kiribati');
+INSERT INTO pomb.country (code, name) VALUES (E'XK', E'Kosovo');
+INSERT INTO pomb.country (code, name) VALUES (E'KW', E'Kuwait');
+INSERT INTO pomb.country (code, name) VALUES (E'KG', E'Kyrgyzstan');
+INSERT INTO pomb.country (code, name) VALUES (E'LA', E'Laos');
+INSERT INTO pomb.country (code, name) VALUES (E'LV', E'Latvia');
+INSERT INTO pomb.country (code, name) VALUES (E'LB', E'Lebanon');
+INSERT INTO pomb.country (code, name) VALUES (E'LS', E'Lesotho');
+INSERT INTO pomb.country (code, name) VALUES (E'LR', E'Liberia');
+INSERT INTO pomb.country (code, name) VALUES (E'LY', E'Libya');
+INSERT INTO pomb.country (code, name) VALUES (E'LI', E'Liechtenstein');
+INSERT INTO pomb.country (code, name) VALUES (E'LT', E'Lithuania');
+INSERT INTO pomb.country (code, name) VALUES (E'LU', E'Luxembourg');
+INSERT INTO pomb.country (code, name) VALUES (E'MO', E'Macau SAR China');
+INSERT INTO pomb.country (code, name) VALUES (E'MK', E'Macedonia');
+INSERT INTO pomb.country (code, name) VALUES (E'MG', E'Madagascar');
+INSERT INTO pomb.country (code, name) VALUES (E'MW', E'Malawi');
+INSERT INTO pomb.country (code, name) VALUES (E'MY', E'Malaysia');
+INSERT INTO pomb.country (code, name) VALUES (E'MV', E'Maldives');
+INSERT INTO pomb.country (code, name) VALUES (E'ML', E'Mali');
+INSERT INTO pomb.country (code, name) VALUES (E'MT', E'Malta');
+INSERT INTO pomb.country (code, name) VALUES (E'MH', E'Marshall Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'MQ', E'Martinique');
+INSERT INTO pomb.country (code, name) VALUES (E'MR', E'Mauritania');
+INSERT INTO pomb.country (code, name) VALUES (E'MU', E'Mauritius');
+INSERT INTO pomb.country (code, name) VALUES (E'YT', E'Mayotte');
+INSERT INTO pomb.country (code, name) VALUES (E'MX', E'Mexico');
+INSERT INTO pomb.country (code, name) VALUES (E'FM', E'Micronesia');
+INSERT INTO pomb.country (code, name) VALUES (E'MD', E'Moldova');
+INSERT INTO pomb.country (code, name) VALUES (E'MC', E'Monaco');
+INSERT INTO pomb.country (code, name) VALUES (E'MN', E'Mongolia');
+INSERT INTO pomb.country (code, name) VALUES (E'ME', E'Montenegro');
+INSERT INTO pomb.country (code, name) VALUES (E'MS', E'Montserrat');
+INSERT INTO pomb.country (code, name) VALUES (E'MA', E'Morocco');
+INSERT INTO pomb.country (code, name) VALUES (E'MZ', E'Mozambique');
+INSERT INTO pomb.country (code, name) VALUES (E'MM', E'Myanmar (Burma)');
+INSERT INTO pomb.country (code, name) VALUES (E'NA', E'Namibia');
+INSERT INTO pomb.country (code, name) VALUES (E'NR', E'Nauru');
+INSERT INTO pomb.country (code, name) VALUES (E'NP', E'Nepal');
+INSERT INTO pomb.country (code, name) VALUES (E'NL', E'Netherlands');
+INSERT INTO pomb.country (code, name) VALUES (E'NC', E'New Caledonia');
+INSERT INTO pomb.country (code, name) VALUES (E'NZ', E'New Zealand');
+INSERT INTO pomb.country (code, name) VALUES (E'NI', E'Nicaragua');
+INSERT INTO pomb.country (code, name) VALUES (E'NE', E'Niger');
+INSERT INTO pomb.country (code, name) VALUES (E'NG', E'Nigeria');
+INSERT INTO pomb.country (code, name) VALUES (E'NU', E'Niue');
+INSERT INTO pomb.country (code, name) VALUES (E'NF', E'Norfolk Island');
+INSERT INTO pomb.country (code, name) VALUES (E'KP', E'North Korea');
+INSERT INTO pomb.country (code, name) VALUES (E'MP', E'Northern Mariana Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'NO', E'Norway');
+INSERT INTO pomb.country (code, name) VALUES (E'OM', E'Oman');
+INSERT INTO pomb.country (code, name) VALUES (E'PK', E'Pakistan');
+INSERT INTO pomb.country (code, name) VALUES (E'PW', E'Palau');
+INSERT INTO pomb.country (code, name) VALUES (E'PS', E'Palestinian Territories');
+INSERT INTO pomb.country (code, name) VALUES (E'PA', E'Panama');
+INSERT INTO pomb.country (code, name) VALUES (E'PG', E'Papua New Guinea');
+INSERT INTO pomb.country (code, name) VALUES (E'PY', E'Paraguay');
+INSERT INTO pomb.country (code, name) VALUES (E'PE', E'Peru');
+INSERT INTO pomb.country (code, name) VALUES (E'PH', E'Philippines');
+INSERT INTO pomb.country (code, name) VALUES (E'PN', E'Pitcairn Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'PL', E'Poland');
+INSERT INTO pomb.country (code, name) VALUES (E'PT', E'Portugal');
+INSERT INTO pomb.country (code, name) VALUES (E'PR', E'Puerto Rico');
+INSERT INTO pomb.country (code, name) VALUES (E'QA', E'Qatar');
+INSERT INTO pomb.country (code, name) VALUES (E'RE', E'Réunion');
+INSERT INTO pomb.country (code, name) VALUES (E'RO', E'Romania');
+INSERT INTO pomb.country (code, name) VALUES (E'RU', E'Russia');
+INSERT INTO pomb.country (code, name) VALUES (E'RW', E'Rwanda');
+INSERT INTO pomb.country (code, name) VALUES (E'WS', E'Samoa');
+INSERT INTO pomb.country (code, name) VALUES (E'SM', E'San Marino');
+INSERT INTO pomb.country (code, name) VALUES (E'ST', E'São Tomé & Príncipe');
+INSERT INTO pomb.country (code, name) VALUES (E'SA', E'Saudi Arabia');
+INSERT INTO pomb.country (code, name) VALUES (E'SN', E'Senegal');
+INSERT INTO pomb.country (code, name) VALUES (E'RS', E'Serbia');
+INSERT INTO pomb.country (code, name) VALUES (E'SC', E'Seychelles');
+INSERT INTO pomb.country (code, name) VALUES (E'SL', E'Sierra Leone');
+INSERT INTO pomb.country (code, name) VALUES (E'SG', E'Singapore');
+INSERT INTO pomb.country (code, name) VALUES (E'SX', E'Sint Maarten');
+INSERT INTO pomb.country (code, name) VALUES (E'SK', E'Slovakia');
+INSERT INTO pomb.country (code, name) VALUES (E'SI', E'Slovenia');
+INSERT INTO pomb.country (code, name) VALUES (E'SB', E'Solomon Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'SO', E'Somalia');
+INSERT INTO pomb.country (code, name) VALUES (E'ZA', E'South Africa');
+INSERT INTO pomb.country (code, name) VALUES (E'GS', E'South Georgia & South Sandwich Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'KR', E'South Korea');
+INSERT INTO pomb.country (code, name) VALUES (E'SS', E'South Sudan');
+INSERT INTO pomb.country (code, name) VALUES (E'ES', E'Spain');
+INSERT INTO pomb.country (code, name) VALUES (E'LK', E'Sri Lanka');
+INSERT INTO pomb.country (code, name) VALUES (E'BL', E'St. Barthélemy');
+INSERT INTO pomb.country (code, name) VALUES (E'SH', E'St. Helena');
+INSERT INTO pomb.country (code, name) VALUES (E'KN', E'St. Kitts & Nevis');
+INSERT INTO pomb.country (code, name) VALUES (E'LC', E'St. Lucia');
+INSERT INTO pomb.country (code, name) VALUES (E'MF', E'St. Martin');
+INSERT INTO pomb.country (code, name) VALUES (E'PM', E'St. Pierre & Miquelon');
+INSERT INTO pomb.country (code, name) VALUES (E'VC', E'St. Vincent & Grenadines');
+INSERT INTO pomb.country (code, name) VALUES (E'SD', E'Sudan');
+INSERT INTO pomb.country (code, name) VALUES (E'SR', E'Suriname');
+INSERT INTO pomb.country (code, name) VALUES (E'SJ', E'Svalbard & Jan Mayen');
+INSERT INTO pomb.country (code, name) VALUES (E'SZ', E'Swaziland');
+INSERT INTO pomb.country (code, name) VALUES (E'SE', E'Sweden');
+INSERT INTO pomb.country (code, name) VALUES (E'CH', E'Switzerland');
+INSERT INTO pomb.country (code, name) VALUES (E'SY', E'Syria');
+INSERT INTO pomb.country (code, name) VALUES (E'TW', E'Taiwan');
+INSERT INTO pomb.country (code, name) VALUES (E'TJ', E'Tajikistan');
+INSERT INTO pomb.country (code, name) VALUES (E'TZ', E'Tanzania');
+INSERT INTO pomb.country (code, name) VALUES (E'TH', E'Thailand');
+INSERT INTO pomb.country (code, name) VALUES (E'TL', E'Timor-Leste');
+INSERT INTO pomb.country (code, name) VALUES (E'TG', E'Togo');
+INSERT INTO pomb.country (code, name) VALUES (E'TK', E'Tokelau');
+INSERT INTO pomb.country (code, name) VALUES (E'TO', E'Tonga');
+INSERT INTO pomb.country (code, name) VALUES (E'TT', E'Trinidad & Tobago');
+INSERT INTO pomb.country (code, name) VALUES (E'TA', E'Tristan da Cunha');
+INSERT INTO pomb.country (code, name) VALUES (E'TN', E'Tunisia');
+INSERT INTO pomb.country (code, name) VALUES (E'TR', E'Turkey');
+INSERT INTO pomb.country (code, name) VALUES (E'TM', E'Turkmenistan');
+INSERT INTO pomb.country (code, name) VALUES (E'TC', E'Turks & Caicos Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'TV', E'Tuvalu');
+INSERT INTO pomb.country (code, name) VALUES (E'UM', E'U.S. Outlying Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'VI', E'U.S. Virgin Islands');
+INSERT INTO pomb.country (code, name) VALUES (E'UG', E'Uganda');
+INSERT INTO pomb.country (code, name) VALUES (E'UA', E'Ukraine');
+INSERT INTO pomb.country (code, name) VALUES (E'AE', E'United Arab Emirates');
+INSERT INTO pomb.country (code, name) VALUES (E'GB', E'United Kingdom');
+INSERT INTO pomb.country (code, name) VALUES (E'UN', E'United Nations');
+INSERT INTO pomb.country (code, name) VALUES (E'US', E'United States');
+INSERT INTO pomb.country (code, name) VALUES (E'UY', E'Uruguay');
+INSERT INTO pomb.country (code, name) VALUES (E'UZ', E'Uzbekistan');
+INSERT INTO pomb.country (code, name) VALUES (E'VU', E'Vanuatu');
+INSERT INTO pomb.country (code, name) VALUES (E'VA', E'Vatican City');
+INSERT INTO pomb.country (code, name) VALUES (E'VE', E'Venezuela');
+INSERT INTO pomb.country (code, name) VALUES (E'VN', E'Vietnam');
+INSERT INTO pomb.country (code, name) VALUES (E'WF', E'Wallis & Futuna');
+INSERT INTO pomb.country (code, name) VALUES (E'EH', E'Western Sahara');
+INSERT INTO pomb.country (code, name) VALUES (E'YE', E'Yemen');
+INSERT INTO pomb.country (code, name) VALUES (E'ZM', E'Zambia');
+INSERT INTO pomb.country (code, name) VALUES (E'ZW', E'Zimbabwe');
+
+CREATE TABLE pomb.user_to_country (
+  id                  serial primary key,
+  user_id             integer not null references pomb.account(id) on delete cascade,
+  country             VARCHAR not null references pomb.country(code) on delete cascade,
+  created_at          timestamp default now()
+);
+
+CREATE TRIGGER user_to_country_INSERT_UPDATE_DELETE
+AFTER INSERT OR DELETE ON pomb.user_to_country
+FOR EACH ROW EXECUTE PROCEDURE pomb_private.if_modified_func();
+
+insert into pomb.user_to_country (user_id, country) values
+  (1, 'CN'),
+  (1, 'US'),
+  (1, 'CA'),
+  (1, 'AU'),
+  (1, 'SA'),
+  (1, 'RU');
+
+comment on table pomb.user_to_country is 'Table with user to country one to many';
+comment on column pomb.user_to_country.id is 'Id for user to country connection';
+comment on column pomb.user_to_country.user_id is 'user of connection';
+comment on column pomb.user_to_country.country is 'Country user has visited';
+comment on column pomb.user_to_country.created_at is 'Timestamp connection created';
+
+alter table pomb.user_to_country enable row level security;
 -- *******************************************************************
 -- *********************** Function Queries **************************
 -- *******************************************************************
@@ -940,6 +1213,7 @@ GRANT ALL ON TABLE pomb.coords TO PUBLIC; --Need to figure this out... Inserting
 GRANT SELECT, INSERT ON TABLE pomb.email_list TO PUBLIC;
 
 GRANT SELECT ON TABLE pomb.post_to_tag to PUBLIC;
+GRANT SELECT ON TABLE pomb.country to PUBLIC;
 
 GRANT ALL on table pomb.config to PUBLIC; -- ultimately needs to only be admin account that can mod
 GRANT select on pomb.post_search_index to PUBLIC;
@@ -1040,6 +1314,15 @@ CREATE POLICY insert_track ON pomb.track for INSERT TO pomb_account
 CREATE POLICY update_track ON pomb.track for UPDATE TO pomb_account
   USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 CREATE POLICY delete_track ON pomb.track for DELETE TO pomb_account
+  USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+
+-- Uset to country policy
+GRANT ALL ON TABLE pomb.user_to_country TO pomb_account, pomb_anonymous;
+CREATE POLICY select_user_to_country ON pomb.user_to_country for SELECT TO pomb_account, pomb_anonymous
+  USING (true);
+CREATE POLICY insert_user_to_country ON pomb.user_to_country for INSERT TO pomb_account
+  WITH CHECK (user_id = current_setting('jwt.claims.account_id')::INTEGER);
+CREATE POLICY delete_user_to_country ON pomb.user_to_country for DELETE TO pomb_account
   USING (user_id = current_setting('jwt.claims.account_id')::INTEGER);
 
 commit;
