@@ -209,6 +209,7 @@ create table pomb.account (
   city                 text check (char_length(first_name) < 80),
   country              text check (char_length(first_name) < 80),
   auto_update_location boolean not null default true,
+  auto_update_visited  boolean not null default true,
   user_status          text check (char_length(first_name) < 300),
   created_at           bigint default (extract(epoch from now()) * 1000),
   updated_at           timestamp default now()
@@ -231,6 +232,7 @@ comment on column pomb.account.hero_photo is 'Hero photo of account';
 comment on column pomb.account.city is 'Current city';
 comment on column pomb.account.country is 'Current country';
 comment on column pomb.account.auto_update_location is 'Toggle to update location on juncture creation';
+comment on column pomb.account.auto_update_visited is 'Toggle to update countries visited on juncture creation';
 comment on column pomb.account.user_status is 'Current status';
 comment on column pomb.account.created_at is 'When account created';
 comment on column pomb.account.updated_at is 'When account last updated';
@@ -923,6 +925,15 @@ $$ language sql stable;
 
 comment on function pomb.search_tags(text) is 'Returns tags containing a given query term.';
 
+create function pomb.search_countries(query text) returns setof pomb.country as $$
+  select country.*
+  from pomb.country as country
+  where country.name ilike ('%' || query || '%')
+  OR country.code ilike ('%' || query || '%')
+$$ language sql stable;
+
+comment on function pomb.search_countries(text) is 'Returns countries containing a given query term.';
+
 -- *******************************************************************
 -- ************************* Triggers ********************************
 -- *******************************************************************
@@ -1226,6 +1237,7 @@ GRANT execute on function pomb.reset_password(text) to pomb_anonymous, pomb_acco
 GRANT execute on function pomb.authenticate_account(text, text) to pomb_anonymous;
 GRANT execute on function pomb.current_account() to PUBLIC;
 GRANT execute on function pomb.search_tags(text) to PUBLIC;
+GRANT execute on function pomb.search_countries(text) to PUBLIC;
 GRANT execute on function pomb.search_posts(text) to PUBLIC;
 GRANT execute on function pomb.search_trips(text) to PUBLIC; 
 GRANT execute on function pomb.search_accounts(text) to PUBLIC;  
