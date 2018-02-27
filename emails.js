@@ -81,4 +81,23 @@ router.post('/registration', (req, res) => {
   });
 });
 
+router.post('/contact', (req, res) => {
+
+  // might be wise to save this in a table eventually and can answer via admin dash, but for now this is fine
+
+  const mailOptions = {
+    to: 'brendan@packonmyback.com',
+    from: '"POMB Contact" <bot@packonmyback.com>',
+    subject: req.body.data.why + ' contact request',
+    text: 'Email received from ' + req.body.data.name + ' at ' + req.body.data.email + '\n\n' +
+      'The following is a ' + req.body.data.why + ' contact request:\n\n' + req.body.data.content
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) res.send({ error });
+    console.log('MESSAGE: ', info.response);
+    res.send({ result: 'Contact email sent' })
+  });
+});
+
 module.exports = router;

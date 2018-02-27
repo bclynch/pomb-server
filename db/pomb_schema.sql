@@ -1198,7 +1198,8 @@ GRANT pomb_account to pomb_anonymous;
 
 create type pomb.jwt_token as (
   role text,
-  account_id integer
+  account_id integer,
+  exp integer
 );
 
 alter database bclynch set "jwt.claims.account_id" to '0';
@@ -1215,7 +1216,7 @@ begin
   where a.email = $1;
 
   if account.password_hash = crypt(password, account.password_hash) then
-    return ('pomb_account', account.account_id)::pomb.jwt_token;
+    return ('pomb_account', account.account_id, extract(epoch from (now() + interval '1 week')))::pomb.jwt_token;
   else
     return null;
   end if;
