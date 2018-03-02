@@ -24,12 +24,14 @@ const pgConnection = {
 const postgraphqlConfig = {
   graphiql: true,
   appendPlugins: [PostGraphileConnectionFilterPlugin],
-  jwtSecret: 'some-secret', 
+  jwtSecret: 'some-secret',
   jwtPgTypeIdentifier: 'pomb.jwt_token'
 };
-app.use(postgraphql(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
-// app.use(postgraphql('postgresql://laze_anonymous:abc123@laze.c0up3bfsdxiy.us-east-1.rds.amazonaws.com:5432/laze?sslmode=require&ssl=1', ['laze','laze_private'], {graphiql: true, jwtSecret: new Buffer('some-secret', 'base64'), jwtPgTypeIdentifier: 'laze.jwt_token'})); // pgDefaultRole: 'bclynch'
-// app.use(postgraphql('postgres://pomb_admin:abc123@localhost:5432/bclynch', ['pomb','pomb_private'], {graphiql: true, jwtSecret: 'some-secret', jwtPgTypeIdentifier: 'pomb.jwt_token'}));
+// dev wiring
+// app.use(postgraphql(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
+
+// prod wiring
+app.use(postgraphql('postgresql://pomb_admin:abc123@packonmyback-production.ckqkbjo37yo6.us-east-2.rds.amazonaws.com:5432/packonmyback_production?sslmode=require&ssl=1', ['pomb','pomb_private'], postgraphqlConfig)); // pgDefaultRole: 'bclynch'
 
 //routes
 app.use('/upload-images', require('./imageProcessing'));
