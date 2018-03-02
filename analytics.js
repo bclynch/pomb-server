@@ -2,7 +2,7 @@ const express = require('express'),
 router = express.Router(),
 google = require('googleapis')
 key = require('./test.json'),
-VIEW_ID = 'ga:163998054';
+VIEW_ID = 'ga:170755351';
 
 // auth the google analytics connection
 let analytics;

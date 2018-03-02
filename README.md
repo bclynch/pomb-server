@@ -4,6 +4,12 @@
 
 `$ node server.js`
 
+## Switching Between local and RDS
+
+- Would be nice to set up env vars for this
+- Need to decide between local config and rds config for db/index.js pg connection
+- Need to decide between local and rds connection for postgraphile connection on server.js
+
 ## Local Postgraphql Setup
 
 - Run `$ psql -f laze_schema.sql`
