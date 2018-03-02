@@ -5,12 +5,8 @@ upload = multer({ storage: multer.memoryStorage(), fileFilter: imageFilter }),
 express = require('express'),
 router = express.Router();
 
-// aws.config.accessKeyId = 'AKIAJULN5HJ76NSVBUUA';
-// aws.config.secretAccessKey = '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';
-// aws.config.region = 'us-east-1';
-
 aws.config.loadFromPath('./config/aws-config.json');
-const photoBucket = new aws.S3({params: {Bucket: 'packonmyback'}});
+const photoBucket = new aws.S3({params: {Bucket: 'packonmyback-production'}});
 
 
 //Route 

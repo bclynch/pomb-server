@@ -1,5 +1,15 @@
 # Pack On My Back Server
 
+## Trying to get running...
+
+- I have this folder sitting on the server at ~/pomb-server
+- There is a reverse proxy running on it for nginx avail sites. Have tried at the root of packonmyback as well a /api
+    - At the root ('/') /graphiql pops up, but without the schema populated. It overrides the www folder in /var/www/packonmyback.com/html though...
+    - /api everything comes back cannot get
+- Can fuck with reverse proxy settings at /etc/nginx/sites-available
+- Maybe have it try to just connect with http://ip-address/port
+    - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04#set-up-nginx-as-a-reverse-proxy-server
+
 ## Run server
 
 `$ node server.js`
