@@ -3,14 +3,13 @@ bodyParser = require('body-parser'),
 cors = require('cors'),
 morgan = require('morgan'),
 app = express(),
-postgraphql = require('postgraphql').postgraphql,
+router = express.Router(),
+{ postgraphile } = require("postgraphile"),
 PostGraphileConnectionFilterPlugin = require('postgraphile-plugin-connection-filter');
 
 app.use(bodyParser.json({limit: '50mb'}));
 app.set('port', process.env.PORT || 5000);
 app.use(cors()); // CORS (Cross-Origin Resource Sharing) headers to support Cross-site HTTP requests
-app.use(express.static("www")); // Our Ionic app build is in the www folder (kept up-to-date by the Ionic CLI using 'ionic serve')
-//https://github.com/postgraphql/postgraphql/blob/d4fd6a4009fea75dbcaa00d743c985148050475e/docs/library.md
 
 /**
  * PostgraphQL
@@ -24,24 +23,29 @@ const pgConnection = {
 };
 const postgraphqlConfig = {
   graphiql: true,
+  graphqlRoute: '/api/graphql',
+  graphiqlRoute: '/api/graphiql',
   appendPlugins: [PostGraphileConnectionFilterPlugin],
   jwtSecret: 'some-secret',
   jwtPgTypeIdentifier: 'pomb.jwt_token'
 };
 // dev wiring
-// app.use(postgraphql(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
+// app.use(postgraphile(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
 
 // prod wiring
-app.use(postgraphql('postgresql://pomb_admin:abc123@packonmyback-production.ckqkbjo37yo6.us-east-2.rds.amazonaws.com:5432/packonmyback_production?sslmode=require&ssl=1', ['pomb','pomb_private'], postgraphqlConfig)); // pgDefaultRole: 'bclynch'
+app.use(postgraphile('postgresql://pomb_admin:abc123@packonmyback.ctpiabtaap4u.us-west-1.rds.amazonaws.com:5432/packonmyback', ['pomb','pomb_private'], postgraphqlConfig)); // pgDefaultRole: 'bclynch'
 
 // logging
 app.use(morgan('combined'));
 
 //routes
-app.use('/upload-images', require('./imageProcessing'));
-app.use('/process-gpx', require('./gpxProcessing'));
-app.use('/analytics', require('./analytics'));
-app.use('/mailing', require('./emails'));
+router.use('/upload-images', require('./imageProcessing'));
+router.use('/process-gpx', require('./gpxProcessing'));
+router.use('/analytics', require('./analytics'));
+router.use('/mailing', require('./emails'));
+
+// api mount path
+app.use('/api', router); 
 
 // Initialize the app.
-app.listen(app.get('port'), 'localhost', () => console.log("You're a wizard, Harry. I'm a what? Yes, a wizard, on port", app.get('port')) );
+app.listen(app.get('port'), 'localhost', () => console.log('You\'re a wizard, Harry. I\'m a what? Yes, a wizard, on port', app.get('port')) );

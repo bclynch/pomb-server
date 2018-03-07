@@ -10,7 +10,7 @@ const localConfig = {
 };
 
 const rdsConfig = {
-  host: 'packonmyback-production.ckqkbjo37yo6.us-east-2.rds.amazonaws.com',
+  host: 'packonmyback.ctpiabtaap4u.us-west-1.rds.amazonaws.com',
   port: 5432,
   user: 'pomb_admin',
   password: 'abc123',

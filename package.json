@@ -19,7 +19,7 @@
     "nodemailer": "^4.4.2",
     "pg": "6.4.2",
     "postgraphile-plugin-connection-filter": "^1.0.0-alpha.8",
-    "postgraphql": "^4.0.0-alpha2.30",
+    "postgraphile": "^4.0.0-alpha2.33",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {},

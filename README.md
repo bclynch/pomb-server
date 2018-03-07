@@ -1,14 +1,18 @@
 # Pack On My Back Server
 
-## Trying to get running...
+## Set up env vars
 
-- I have this folder sitting on the server at ~/pomb-server
-- There is a reverse proxy running on it for nginx avail sites. Have tried at the root of packonmyback as well a /api
-    - At the root ('/') /graphiql pops up, but without the schema populated. It overrides the www folder in /var/www/packonmyback.com/html though...
-    - /api everything comes back cannot get
-- Can fuck with reverse proxy settings at /etc/nginx/sites-available
-- Maybe have it try to just connect with http://ip-address/port
-    - https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04#set-up-nginx-as-a-reverse-proxy-server
+https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps 
+
+## Future Considerations
+
+- Interesting Docker setup https://medium.com/@tiangolo/angular-in-docker-with-nginx-supporting-environments-built-with-multi-stage-docker-builds-bb9f1724e984
+
+## Migration
+
+- Haven't done this yet, but will need to write out the process eventually
+- Seems to be a popular package for it https://github.com/db-migrate/node-db-migrate
+- Would recommend spinning up a dummy instance, testing with it and figuring out how to change scheme, then doing for first time on real db (after a snapshot of course)
 
 ## Run server
 
@@ -183,6 +187,11 @@ PM2 provides many subcommands that allow you to manage or look up information ab
 ## AWS
 
 *AWS allows multiple schemas whereas Heorku does not!*
+### Creating an RDS DB
+
+- Important reminders:
+    - Set the option for making the db public so you get an endpoint for it. Must be done on creation!
+    - Set inbound security group to be all traffic (something like 0.0.0.0) otherwise it hangs and doesn't work
 ### Basic Setup
 - Install AWS CLI `$ brew install awscli`
 - Launch a new RDS instance from AWS console
@@ -197,10 +206,3 @@ PM2 provides many subcommands that allow you to manage or look up information ab
 - psql --host=laze.c0up3bfsdxiy.us-east-1.rds.amazonaws.com --port=5432 --username bclynch --password --dbname=laze
 - Make sure you identify the schema with your query statements + semicolons to get it to work properly.
 - Need to change the security group setting to allow inbound traffic from anywhere to avoid 503
-### Connect with front end
-- Add following lines
-``` js
-var postgraphql = require('postgraphql').postgraphql;
-var app = express();
-app.use(postgraphql('postgresql://<username>:<password>@<endpoint>:<port#>/<db_name>?sslmode=require&ssl=1', '<schema_name>', {graphiql: true}));
-```
