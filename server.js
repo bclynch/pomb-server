@@ -1,6 +1,7 @@
 const express = require('express'),
 bodyParser = require('body-parser'),
 cors = require('cors'),
+fs = require('fs'),
 morgan = require('morgan'),
 app = express(),
 router = express.Router(),
@@ -8,7 +9,8 @@ router = express.Router(),
 PostGraphileConnectionFilterPlugin = require('postgraphile-plugin-connection-filter');
 require('dotenv').config();
 
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.set('port', process.env.PORT || 5000);
 app.use(cors()); // CORS (Cross-Origin Resource Sharing) headers to support Cross-site HTTP requests
 
@@ -38,8 +40,9 @@ if (process.env.NODE_ENV === 'production') {
   app.use(postgraphile(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
 }
 
-// logging
-app.use(morgan('combined'));
+//set up the logger
+var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+app.use(morgan('combined',  { "stream": accessLogStream }));
 
 //routes
 router.use('/upload-images', require('./imageProcessing'));

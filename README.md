@@ -45,6 +45,8 @@
     - Install node
     - Setup pm2
     - Setup reverse proxy for nginx
+    - If uploading files be mindful of nginx max sizes or it will fail!!! 
+        - https://stackoverflow.com/questions/2056124/nginx-client-max-body-size-has-no-effect
 - Setup SFTP https://www.digitalocean.com/community/tutorials/how-to-use-sftp-to-securely-transfer-files-with-a-remote-server
 - Setup mail https://www.digitalocean.com/community/tutorials/how-to-set-up-zoho-mail-with-a-custom-domain-managed-by-digitalocean-dns
 

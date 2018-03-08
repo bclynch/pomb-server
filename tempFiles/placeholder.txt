@@ -1,0 +1,1 @@
+This folder doesn't get passed along to git without something in it. Subsequently it doesn't get pulled into remote server and things trying to get copied to it will fail. Fuck me.
