@@ -1,9 +1,5 @@
 # Pack On My Back Server
 
-## Set up env vars
-
-https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environmental-and-shell-variables-on-a-linux-vps 
-
 ## Future Considerations
 
 - Interesting Docker setup https://medium.com/@tiangolo/angular-in-docker-with-nginx-supporting-environments-built-with-multi-stage-docker-builds-bb9f1724e984
@@ -18,19 +14,15 @@ https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environment
 
 `$ node server.js`
 
-## Switching Between local and RDS
+## Logging Into Digital Ocean Server
 
-- Would be nice to set up env vars for this
-- Need to decide between local config and rds config for db/index.js pg connection
-- Need to decide between local and rds connection for postgraphile connection on server.js
-
-## Local Postgraphql Setup
-
-- Run `$ psql -f laze_schema.sql`
-- Run `$ psql -f laze_data.sql`
-- To update: 
-    - Run `$ psql -f schema_drop.sql`
-    - Run the above setup again
+- SSH into server
+    - `$ ssh <user>@<ip_address>`
+    - `$ ssh bclynch@138.68.63.87`
+- Switch user
+    - `$ su - bclynch`
+- Go to root
+    - `$ exit`
 
 ## Digital Ocean
 
@@ -55,17 +47,6 @@ https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environment
     - Setup reverse proxy for nginx
 - Setup SFTP https://www.digitalocean.com/community/tutorials/how-to-use-sftp-to-securely-transfer-files-with-a-remote-server
 - Setup mail https://www.digitalocean.com/community/tutorials/how-to-set-up-zoho-mail-with-a-custom-domain-managed-by-digitalocean-dns
-
-
-### Logging Into Server
-
-- SSH into server
-    - `$ ssh <user>@<ip_address>`
-    - `$ ssh bclynch@138.68.63.87`
-- Switch user
-    - `$ su - bclynch`
-- Go to root
-    - `$ exit`
 
 #### Add New Key To Existing Server
 
@@ -92,6 +73,18 @@ https://www.digitalocean.com/community/tutorials/how-to-read-and-set-environment
 
 - Server should be updated frequently with the following:
     - `$ apt-get update && apt-get upgrade`
+
+### ENV Variables
+
+- Used to pass in secret information from the server into Node application
+- https://medium.com/ibm-watson-data-lab/environment-variables-or-keeping-your-secrets-secret-in-a-node-js-app-99019dfff716
+- Use export to set an env var
+    - Ex: `$ export MYAPIKEY=ndsvn2g8dnsb9hsg`
+    - Env vars are always all capital letters
+    - This can be used in Node with process.env.MYAPIKEY variable
+- Delete env vars with `$ unset <var_name>`
+- Check out your existing variables with printenv command in bash
+- AWS automatically pulls env vars https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html
 
 ### nginx
 
@@ -183,6 +176,14 @@ PM2 provides many subcommands that allow you to manage or look up information ab
 `$ pm2 monit`
 
 - Now that your Node.js application is running, and managed by PM2, let's set up the reverse proxy.
+
+## Local Postgraphql Setup
+
+- Run `$ psql -f laze_schema.sql`
+- Run `$ psql -f laze_data.sql`
+- To update: 
+    - Run `$ psql -f schema_drop.sql`
+    - Run the above setup again
 
 ## AWS
 

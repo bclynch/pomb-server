@@ -17,7 +17,7 @@ app.use(cors()); // CORS (Cross-Origin Resource Sharing) headers to support Cros
 const pgConnection = {
   host: 'localhost',
   user: 'pomb_admin',
-  password: 'abc123',
+  password: process.env.DATABASE_PASSWORD,
   database: 'bclynch',
   port: 5432
 };
@@ -29,11 +29,13 @@ const postgraphqlConfig = {
   jwtSecret: 'some-secret',
   jwtPgTypeIdentifier: 'pomb.jwt_token'
 };
-// dev wiring
-// app.use(postgraphile(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
 
-// prod wiring
-app.use(postgraphile('postgresql://pomb_admin:abc123@packonmyback.ctpiabtaap4u.us-west-1.rds.amazonaws.com:5432/packonmyback', ['pomb','pomb_private'], postgraphqlConfig)); // pgDefaultRole: 'bclynch'
+// choose correct postgraphile depending on env
+if (process.env.NODE_ENV === 'production') {
+  app.use(postgraphile(`postgresql://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_ADDRESS}:5432/${process.env.DATABASE_NAME}`, ['pomb','pomb_private'], postgraphqlConfig));
+} else {
+  app.use(postgraphile(pgConnection, ['pomb','pomb_private'], postgraphqlConfig));
+}
 
 // logging
 app.use(morgan('combined'));
@@ -48,4 +50,4 @@ router.use('/mailing', require('./emails'));
 app.use('/api', router); 
 
 // Initialize the app.
-app.listen(app.get('port'), 'localhost', () => console.log('You\'re a wizard, Harry. I\'m a what? Yes, a wizard, on port', app.get('port')) );
+app.listen(app.get('port'), 'localhost', () => console.log(`You're a wizard, Harry. I'm a what? Yes, a wizard. Spinning up ${process.env.NODE_ENV === 'production' ? 'production' : 'dev'} on port`, app.get('port')) );

@@ -10,14 +10,14 @@ const localConfig = {
 };
 
 const rdsConfig = {
-  host: 'packonmyback.ctpiabtaap4u.us-west-1.rds.amazonaws.com',
+  host: process.env.DATABASE_ADDRESS,
   port: 5432,
-  user: 'pomb_admin',
-  password: 'abc123',
-  database: 'packonmyback_production'
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
+  database: process.env.DATABASE_NAME
 }
 
-const pool = new pg.Pool(rdsConfig);
+const pool = process.env.NODE_ENV === 'production' ? new pg.Pool(rdsConfig) : new pg.Pool(localConfig);
 let myClient;
 
 module.exports = {

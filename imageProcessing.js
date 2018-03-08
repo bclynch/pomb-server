@@ -5,8 +5,9 @@ upload = multer({ storage: multer.memoryStorage(), fileFilter: imageFilter }),
 express = require('express'),
 router = express.Router();
 
-aws.config.loadFromPath('./config/aws-config.json');
-const photoBucket = new aws.S3({params: {Bucket: 'packonmyback-production'}});
+// Access key and secret id being pulled from env vars and in my drive as backup
+aws.config.update({ region: process.env.AWS_REGION });
+const photoBucket = process.env.NODE_ENV === 'production' ? new aws.S3({params: {Bucket: 'packonmyback-production'}}) : new aws.S3({params: {Bucket: 'packonmyback-dev'}});
 
 
 //Route 
