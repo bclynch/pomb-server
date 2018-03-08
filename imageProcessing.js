@@ -4,6 +4,7 @@ multer = require('multer'),
 upload = multer({ storage: multer.memoryStorage(), fileFilter: imageFilter }),
 express = require('express'),
 router = express.Router();
+require('dotenv').config();
 
 // Access key and secret id being pulled from env vars and in my drive as backup
 aws.config.update({ region: process.env.AWS_REGION });

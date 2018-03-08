@@ -2,6 +2,7 @@ const express = require('express'),
 router = express.Router(),
 fs = require('fs'),
 nodemailer = require('nodemailer');
+require('dotenv').config();
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.zoho.com',
@@ -9,7 +10,7 @@ const transporter = nodemailer.createTransport({
     secure: true, // use SSL
     auth: {
       user: 'bot@packonmyback.com',
-      pass: 'Bear2013'
+      pass: process.env.BOT_PASSWORD
     }
 });
 

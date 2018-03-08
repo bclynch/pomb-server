@@ -77,12 +77,11 @@
 ### ENV Variables
 
 - Used to pass in secret information from the server into Node application
-- https://medium.com/ibm-watson-data-lab/environment-variables-or-keeping-your-secrets-secret-in-a-node-js-app-99019dfff716
-- Use export to set an env var
-    - Ex: `$ export MYAPIKEY=ndsvn2g8dnsb9hsg`
-    - Env vars are always all capital letters
+- Use .env file to maintain your vars
+    - Syntax: MYAPIKEY=ndsvn2g8dnsb9hsg
+    - Env vars are always all capital letters + underscores
     - This can be used in Node with process.env.MYAPIKEY variable
-- Delete env vars with `$ unset <var_name>`
+    - Always put .env it gitignore
 - Check out your existing variables with printenv command in bash
 - AWS automatically pulls env vars https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-node-credentials-environment.html
 

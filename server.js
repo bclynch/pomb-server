@@ -6,6 +6,7 @@ app = express(),
 router = express.Router(),
 { postgraphile } = require("postgraphile"),
 PostGraphileConnectionFilterPlugin = require('postgraphile-plugin-connection-filter');
+require('dotenv').config();
 
 app.use(bodyParser.json({limit: '50mb'}));
 app.set('port', process.env.PORT || 5000);
@@ -16,7 +17,7 @@ app.use(cors()); // CORS (Cross-Origin Resource Sharing) headers to support Cros
  */
 const pgConnection = {
   host: 'localhost',
-  user: 'pomb_admin',
+  user: process.env.DATABASE_USER,
   password: process.env.DATABASE_PASSWORD,
   database: 'bclynch',
   port: 5432
@@ -26,7 +27,7 @@ const postgraphqlConfig = {
   graphqlRoute: '/api/graphql',
   graphiqlRoute: '/api/graphiql',
   appendPlugins: [PostGraphileConnectionFilterPlugin],
-  jwtSecret: 'some-secret',
+  jwtSecret: process.env.JWT_SECRET,
   jwtPgTypeIdentifier: 'pomb.jwt_token'
 };
 

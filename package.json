@@ -9,6 +9,7 @@
     "aws-sdk": "^2.97.0",
     "body-parser": "^1.17.2",
     "cors": "^2.8.4",
+    "dotenv": "^5.0.1",
     "express": "^4.15.4",
     "geolib": "^2.0.24",
     "googleapis": "^25.0.0",
@@ -18,8 +19,8 @@
     "multer": "^1.3.0",
     "nodemailer": "^4.4.2",
     "pg": "6.4.2",
-    "postgraphile-plugin-connection-filter": "^1.0.0-alpha.8",
     "postgraphile": "^4.0.0-alpha2.33",
+    "postgraphile-plugin-connection-filter": "^1.0.0-alpha.8",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {},

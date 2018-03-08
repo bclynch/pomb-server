@@ -1,6 +1,7 @@
 const pg = require('pg');
 const PGUSER = 'pomb_admin';
 const PGDATABASE = 'bclynch';
+require('dotenv').config();
 
 const localConfig = {
   user: PGUSER, // name of the user account

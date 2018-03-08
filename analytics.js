@@ -1,8 +1,8 @@
 const express = require('express'),
 router = express.Router(),
 google = require('googleapis')
-key = require('./test.json'),
-VIEW_ID = 'ga:170755351';
+key = require('./config/analytics.json');
+require('dotenv').config();
 
 // auth the google analytics connection
 let analytics;
@@ -26,7 +26,7 @@ router.get("/getViews", (req, res) => {
 function queryPageViews(path, res) {
   analytics.data.ga.get({
     'auth': jwtClient,
-    'ids': VIEW_ID,
+    'ids': process.env.ANALYTICS_VIEW_ID,
     'metrics': 'ga:pageviews',
     'dimensions': 'ga:pagePath',
     'start-date': '30daysAgo',
