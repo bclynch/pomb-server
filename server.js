@@ -45,7 +45,7 @@ var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a
 app.use(morgan('combined',  { "stream": accessLogStream }));
 
 //routes
-router.use('/upload-images', require('./imageProcessing'));
+router.use('/upload-images', require('./imageProcessor'));
 router.use('/process-gpx', require('./gpxProcessing'));
 router.use('/analytics', require('./analytics'));
 router.use('/mailing', require('./emails'));
