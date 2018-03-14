@@ -8,6 +8,7 @@
     "@mapbox/togeojson": "^0.16.0",
     "aws-sdk": "^2.97.0",
     "body-parser": "^1.17.2",
+    "compression": "^1.7.2",
     "cors": "^2.8.4",
     "dotenv": "^5.0.1",
     "express": "^4.15.4",

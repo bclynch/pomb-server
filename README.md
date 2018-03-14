@@ -41,6 +41,10 @@
 - Secure nginx with SSL https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04#step-4-%E2%80%94-obtaining-an-ssl-certificate
     - Issue as of writing https://github.com/certbot/certbot/issues/5405#issuecomment-356498627
     - Webroot aka path is how its set up in nginx. Example would be /var/www/bclynch.com/html
+    - http2 support - https://www.digitalocean.com/community/tutorials/how-to-set-up-nginx-with-http-2-support-on-ubuntu-16-04
+    - Setup gzip and browser cache
+        - https://www.digitalocean.com/community/tutorials/how-to-increase-pagespeed-score-by-changing-your-nginx-configuration-on-ubuntu-16-04#step-3-%E2%80%94-configuring-browser-caching
+        - https://jakearchibald.com/2016/caching-best-practices/
 - Get node app rolling https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04
     - Install node
     - Setup pm2

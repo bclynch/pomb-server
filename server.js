@@ -1,5 +1,6 @@
 const express = require('express'),
 bodyParser = require('body-parser'),
+compression = require('compression'),
 cors = require('cors'),
 fs = require('fs'),
 morgan = require('morgan'),
@@ -12,6 +13,7 @@ require('dotenv').config();
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 }));
 app.set('port', process.env.PORT || 5000);
+app.use(compression()); // compress all responses
 app.use(cors()); // CORS (Cross-Origin Resource Sharing) headers to support Cross-site HTTP requests
 
 /**
