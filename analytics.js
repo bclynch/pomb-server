@@ -6,16 +6,21 @@ require('dotenv').config();
 
 // auth the google analytics connection
 let analytics;
-let jwtClient = new google.auth.JWT(
-  key.client_email, null, key.private_key,
-  ['https://www.googleapis.com/auth/analytics.readonly'], null);
-jwtClient.authorize((err, tokens) => {
-  if (err) {
-    console.log(err);
-    return;
-  }
-  analytics = google.analytics('v3');
+// let jwtClient = new google.auth.JWT(
+//   key.client_email, null, key.private_key,
+//   ['https://www.googleapis.com/auth/analytics.readonly'], null);
+// jwtClient.authorize((err, tokens) => {
+//   if (err) {
+//     console.log(err);
+//     return;
+//   }
+//   analytics = google.analytics('v3');
+// });
+const auth = new google.auth.GoogleAuth({
+  // Scopes can be specified either as an array or as a single, space-delimited string.
+  scopes: ['https://www.googleapis.com/auth/analytics.readonly']
 });
+const authClient = await auth.getClient();
 
 // Route 
 router.get("/getViews", (req, res) => {

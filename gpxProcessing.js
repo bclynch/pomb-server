@@ -1,6 +1,5 @@
 const convertGPX = require('@mapbox/togeojson'),
 fs = require('fs'),
-geolib = require('geolib'),
 DOMParser = require('xmldom').DOMParser,
 multer = require('multer'),
 tempFolderPath = './tempFiles/',

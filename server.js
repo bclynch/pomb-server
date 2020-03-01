@@ -5,6 +5,7 @@ cors = require('cors'),
 fs = require('fs'),
 morgan = require('morgan'),
 app = express(),
+email = require('./ses'),
 router = express.Router(),
 { postgraphile } = require("postgraphile"),
 PostGraphileConnectionFilterPlugin = require('postgraphile-plugin-connection-filter');
@@ -32,7 +33,8 @@ const postgraphqlConfig = {
   graphiqlRoute: '/api/graphiql',
   appendPlugins: [PostGraphileConnectionFilterPlugin],
   jwtSecret: process.env.JWT_SECRET,
-  jwtPgTypeIdentifier: 'pomb.jwt_token'
+  jwtPgTypeIdentifier: 'pomb.jwt_token',
+  enhanceGraphiql: true,
 };
 
 // choose correct postgraphile depending on env
@@ -49,8 +51,11 @@ app.use(morgan('combined',  { "stream": accessLogStream }));
 //routes
 router.use('/upload-images', require('./imageProcessor'));
 router.use('/process-gpx', require('./gpxProcessing'));
-router.use('/analytics', require('./analytics'));
-router.use('/mailing', require('./emails'));
+// router.use('/analytics', require('./analytics'));
+// router.use('/mailing', require('./emails'));
+
+// email testing
+// email.sendEmail();
 
 // api mount path
 app.use('/api', router); 
