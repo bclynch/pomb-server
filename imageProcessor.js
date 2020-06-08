@@ -116,7 +116,10 @@ function maskAndUploadImage(file, size, name) {
     // resize img first
     sharp(file.buffer)
       .resize(size, size)
-      .overlayWith(roundedCorners, { cutout: true })
+      .composite([{
+        input: roundedCorners,
+        blend: 'dest-in'
+      }])
       .png()
       .toBuffer()
       .then(
