@@ -23,7 +23,7 @@
     "postgraphile": "4.5.5",
     "postgraphile-plugin-connection-filter": "1.1.3",
     "sharp": "^0.24.1",
-    "xmldom": "^0.2.1"
+    "xmldom": "^0.6.0"
   },
   "devDependencies": {},
   "description": "Pack On My Back Server"
