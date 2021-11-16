@@ -6,7 +6,7 @@
   "private": true,
   "dependencies": {
     "@mapbox/togeojson": "^0.16.0",
-    "aws-sdk": "^2.630.0",
+    "aws-sdk": "^2.814.0",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
